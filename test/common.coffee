@@ -2,9 +2,9 @@
 describe "the casperChai addons to Chai", ->
 
   it "includes the 'inDOM' property", ->
-    casper.open "#{serverAddr}/test"
+    casper.open "simple.html"
     casper.then ->
-      expect("#hello").to.not.be.inDOM
+      expect("#header_1").to.be.inDOM
       expect("#hello").to.not.be.inDOM
 
 

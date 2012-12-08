@@ -17,8 +17,8 @@ casperChai = (_chai, utils) ->
   _chai.Assertion.addProperty('inDOM', () ->
     selector = @_obj
     @assert(casper.exists(selector),
-        'expected selector #{this} to be in the DOM',
-        'expected selector #{this} to not be in the DOM'
+        'expected selector #{this} to be in the DOM, but it was not',
+        'expected selector #{this} to not be in the DOM, but it was'
     )
   )
 

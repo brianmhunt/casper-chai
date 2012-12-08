@@ -277,33 +277,6 @@ if (!Function.prototype.bind) {
     return fBound;
   };
 }
-/*
- * Start Mongoose webserver
- * https://github.com/ariya/phantomjs/wiki/API-Reference
- */ 
-require('webserver').create().listen(serverPort, function (request, response) {
-  var fileToRead;
-  response.statusCode = 200;
-
-  /* For obvious reasons, don't leave this running. It can read any file passed
-   * in.
-   */
-  fileToRead = _.str.strRightBack(request.url, "/");
-
-  if (fileToRead.indexOf('..') !== -1) {
-    response.statusCode = 403; // forbidden
-    response.write("Forbidden: " + fileToRead);
-  }
-
-  console.log("Sending file", fileToRead);
-
-  response.write(fs.read(fileToRead));
-
-  response.close();
-});
-
-
-
 
 /*
  * Start casper.
