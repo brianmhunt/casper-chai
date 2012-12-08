@@ -12,6 +12,22 @@ Copyright (C) 2012 Brian M Hunt
 
 casperChai = (_chai, utils) ->
 
+  _matches = (string_or_regex, value) ->
+    console.log()
+    if typeof string_or_regex == 'string'
+      regex = new RegExp("^#{string_or_regex}$")
+    else if Object.prototype.toString.call(
+      string_or_regex).indexOf('RegExp') != -1
+      # TODO: Test if it's actually a regexp?
+      regex = string_or_regex
+    else
+      throw new Error("Test received #{string_or_regex}, but expected string"
+        + " or regular expression.")
+    return regex.test(value)
+    
+
+
+
   # use "inDOM" instead of "exist" so we don't conflict with
   # chai.js bdd
   _chai.Assertion.addProperty 'inDOM', () ->
@@ -38,6 +54,27 @@ casperChai = (_chai, utils) ->
         'expected resource #{this} to not exist, but it does'
     )
 
+  # true when the the title matches the given regular expression,
+  # or where a string is used match that string exactly.
+  _chai.Assertion.addProperty 'matchTitle', ->
+    matcher = @_obj
+
+    title = casper.getTitle()
+    @assert(_matches(matcher, title),
+        'expected title #{this} to match #{exp}, but it did not',
+        'expected title #{this} to not match #{exp}, but it did',
+    )
+
+  _chai.Assertion.addProperty 'matchCurrentUrl', ->
+    matcher = @_obj
+    currentUrl = casper.getCurrentUrl()
+    @assert(_matches(matcher, currentUrl),
+      'expected url #{exp} to match #{this}, but it did not',
+      'expected url #{exp} to not match #{this}, but it did'
+    )
+    
+
+
   _chai.Assertion.addProperty 'textInDOM', ->
     needle = @_obj
     haystack = casper.evaluate ->
@@ -47,6 +84,8 @@ casperChai = (_chai, utils) ->
       'expected text #{this} to be in the document, but it was not'
       'expected text #{this} to not be in the document, but it was found'
     )
+
+
 
     
 

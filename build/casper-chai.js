@@ -15,6 +15,19 @@ Copyright (C) 2012 Brian M Hunt
   var casperChai;
 
   casperChai = function(_chai, utils) {
+    var _matches;
+    _matches = function(string_or_regex, value) {
+      var regex;
+      console.log();
+      if (typeof string_or_regex === 'string') {
+        regex = new RegExp("^" + string_or_regex + "$");
+      } else if (Object.prototype.toString.call(string_or_regex).indexOf('RegExp') !== -1) {
+        regex = string_or_regex;
+      } else {
+        throw new Error("Test received " + string_or_regex + ", but expected string", +" or regular expression.");
+      }
+      return regex.test(value);
+    };
     _chai.Assertion.addProperty('inDOM', function() {
       var selector;
       selector = this._obj;
@@ -30,6 +43,18 @@ Copyright (C) 2012 Brian M Hunt
       var resourceTest;
       resourceTest = this._obj;
       return this.assert(casper.resourceExists(resourceTest), 'expected resource #{this} to exist, but it does not', 'expected resource #{this} to not exist, but it does');
+    });
+    _chai.Assertion.addProperty('matchTitle', function() {
+      var matcher, title;
+      matcher = this._obj;
+      title = casper.getTitle();
+      return this.assert(_matches(matcher, title), 'expected title #{this} to match #{exp}, but it did not', 'expected title #{this} to not match #{exp}, but it did');
+    });
+    _chai.Assertion.addProperty('matchCurrentUrl', function() {
+      var currentUrl, matcher;
+      matcher = this._obj;
+      currentUrl = casper.getCurrentUrl();
+      return this.assert(_matches(matcher, currentUrl), 'expected url #{exp} to match #{this}, but it did not', 'expected url #{exp} to not match #{this}, but it did');
     });
     _chai.Assertion.addProperty('textInDOM', function() {
       var haystack, needle;
