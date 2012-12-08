@@ -33,8 +33,11 @@ describe "the Casper-Chai addons to Chai", ->
       expect(casper.getCurrentUrl()).to.matchCurrentUrl
       expect(casper.getCurrentUrl()+"X").to.not.matchCurrentUrl
 
+  it "includes 'hasFieldValue' method", ->
+    casper.then ->
+      expect("anamedfield").to.have.fieldValue("42")
 
-  it "is easy to test HttpStatus", ->
+  it "trivially tests HttpStatus", ->
     casper.then ->
       expect(casper.currentHTTPStatus).to.equal(null) # we loaded from a file
 
@@ -43,4 +46,9 @@ describe "the Casper-Chai addons to Chai", ->
     casper.then ->
       expect(casper.currentHTTPStatus).to.equal(200) # we loaded over http
 
+  it "trivially tests remote content", ->
+    casper.then ->
+      remote_value = casper.evaluate(-> document.title + "eee")
+
+      expect(remote_value).to.equal("The Titleeee")
 

@@ -16,17 +16,13 @@ casperChai = (_chai, utils) ->
     console.log()
     if typeof string_or_regex == 'string'
       regex = new RegExp("^#{string_or_regex}$")
-    else if Object.prototype.toString.call(
-      string_or_regex).indexOf('RegExp') != -1
-      # TODO: Test if it's actually a regexp?
+    else if _.isRegExp(string_or_regex)
       regex = string_or_regex
     else
       throw new Error("Test received #{string_or_regex}, but expected string"
         + " or regular expression.")
     return regex.test(value)
     
-
-
 
   # use "inDOM" instead of "exist" so we don't conflict with
   # chai.js bdd
@@ -72,8 +68,6 @@ casperChai = (_chai, utils) ->
       'expected url #{exp} to match #{this}, but it did not',
       'expected url #{exp} to not match #{this}, but it did'
     )
-    
-
 
   _chai.Assertion.addProperty 'textInDOM', ->
     needle = @_obj
@@ -85,28 +79,29 @@ casperChai = (_chai, utils) ->
       'expected text #{this} to not be in the document, but it was found'
     )
 
+  _chai.Assertion.addMethod 'fieldValue', (givenValue) ->
+    selector = @_obj
 
+    if _.isString(selector)
+      # TODO switch to a generic selector [name=selector]
+    else
+      # FIXME when we use a generic selector, always do this check
+      expect(selector).to.be.inDOM
 
-    
+    # FIXME should use something like getFieldValue from casperjs::clientutils
+    # but with all selectors
+    get_remote_value = (selector) ->
+      return __utils__.getFieldValue(selector)
 
+    remoteValue = casper.evaluate(get_remote_value, selector: selector)
 
-
-    
-
-
-
-  #
-  # remote evaluation of the subject returns true
-  _chai.Assertion.addProperty "evalTrue", () ->
-    subject = @_obj
-
-    fn = ->
-      val = casper.evaluate(subject)
-
-    @assert(fn,
-        'expected selector #{this} to be in the DOM, but it was not',
-        'expected selector #{this} to not be in the DOM, but it was'
+    @assert(remoteValue == givenValue,
+      "expected field(s) #{selector} to have value #{givenValue}, " +
+        "but it was #{remoteValue}",
+      "expected field(s) #{selector} to not have value #{givenValue}, " +
+        "but it was"
     )
+
 
 
 

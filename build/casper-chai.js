@@ -21,7 +21,7 @@ Copyright (C) 2012 Brian M Hunt
       console.log();
       if (typeof string_or_regex === 'string') {
         regex = new RegExp("^" + string_or_regex + "$");
-      } else if (Object.prototype.toString.call(string_or_regex).indexOf('RegExp') !== -1) {
+      } else if (_.isRegExp(string_or_regex)) {
         regex = string_or_regex;
       } else {
         throw new Error("Test received " + string_or_regex + ", but expected string", +" or regular expression.");
@@ -64,14 +64,21 @@ Copyright (C) 2012 Brian M Hunt
       });
       return this.assert(haystack.indexOf(needle) !== -1, 'expected text #{this} to be in the document, but it was not', 'expected text #{this} to not be in the document, but it was found');
     });
-    return _chai.Assertion.addProperty("evalTrue", function() {
-      var fn, subject;
-      subject = this._obj;
-      fn = function() {
-        var val;
-        return val = casper.evaluate(subject);
+    return _chai.Assertion.addMethod('fieldValue', function(givenValue) {
+      var get_remote_value, remoteValue, selector;
+      selector = this._obj;
+      if (_.isString(selector)) {
+
+      } else {
+        expect(selector).to.be.inDOM;
+      }
+      get_remote_value = function(selector) {
+        return __utils__.getFieldValue(selector);
       };
-      return this.assert(fn, 'expected selector #{this} to be in the DOM, but it was not', 'expected selector #{this} to not be in the DOM, but it was');
+      remoteValue = casper.evaluate(get_remote_value, {
+        selector: selector
+      });
+      return this.assert(remoteValue === givenValue, ("expected field(s) " + selector + " to have value " + givenValue + ", ") + ("but it was " + remoteValue), ("expected field(s) " + selector + " to not have value " + givenValue + ", ") + "but it was");
     });
   };
 
