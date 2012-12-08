@@ -10,7 +10,7 @@ var fs          = require('fs'),
   utils         = require('utils'),
   cwd           = fs.workingDirectory,
   serverPort    = 8523, // the port where we create a server
-  serverAddr    = "localhost:"+serverPort,
+  testServer    = "http://localhost:"+serverPort,
   any_failures  = false, // true when there has been a failure
   casper;
 
@@ -67,6 +67,9 @@ chai = require("../contrib/chai");
 assert = chai.assert;
 expect = chai.expect;
 
+// we don't get much debugging info on the console, so this can be helpful
+chai.Assertion.includeStack = true;
+
 // FIXME: the following throws
 //      RangeError: Maximum call stack size exceeded.
 // should = chai.should();
@@ -86,8 +89,8 @@ casper = require('casper').create({
     onTimeout: function (err) {
       console.log(("Timeout: " + err).redbg.white);
     },
-    logLevel: 'debug',
-    verbose: true,
+    // logLevel: 'debug',
+    // verbose: true,
 });
 
 /*
@@ -277,6 +280,36 @@ if (!Function.prototype.bind) {
     return fBound;
   };
 }
+/*
+ * Start Mongoose webserver
+ * https://github.com/ariya/phantomjs/wiki/API-Reference
+ */ 
+require('webserver').create().listen(serverPort, function (request, response) {
+  var fileToRead, content;
+  response.statusCode = 200;
+
+  /* For what should be obvious reasons, don't leave this running. 
+   */
+  fileToRead = "./" + _.str.strRightBack(request.url, "/");
+
+  if (fileToRead.indexOf('..') !== -1) {
+    response.statusCode = 403; // forbidden
+    response.write("Forbidden: " + fileToRead);
+  }
+
+  console.log("[testServer:".inverse + fileToRead.inverse + "]".inverse);
+
+  content = fs.read(fileToRead);
+  response.write(content);
+
+  response.close();
+});
+
+console.log("Started test webserver on localhost:".yellow + 
+    String(serverPort).yellow);
+
+
+
 
 /*
  * Start casper.
