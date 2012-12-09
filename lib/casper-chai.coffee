@@ -11,9 +11,10 @@ Copyright (C) 2012 Brian M Hunt
 # TODO/FIXME: Pass the casper instance in (instead of using global casper)
 
 casperChai = (_chai, utils) ->
+  properties = []
+  methods = []
 
   _matches = (string_or_regex, value) ->
-    console.log()
     if typeof string_or_regex == 'string'
       regex = new RegExp("^#{string_or_regex}$")
     else if _.isRegExp(string_or_regex)
@@ -22,11 +23,18 @@ casperChai = (_chai, utils) ->
       throw new Error("Test received #{string_or_regex}, but expected string"
         + " or regular expression.")
     return regex.test(value)
+
+  assert.casper = {}
     
+  _addProperty = (name, func) ->
+    _chai.Assertion.addProperty(name, func)
+
+  _addMethod = (name, method) ->
+    _chai.Assertion.addMethod(name, method)
 
   # use "inDOM" instead of "exist" so we don't conflict with
   # chai.js bdd
-  _chai.Assertion.addProperty 'inDOM', () ->
+  _addProperty 'inDOM', () ->
     selector = @_obj
     @assert(casper.exists(selector),
         'expected selector #{this} to be in the DOM, but it was not',
@@ -34,7 +42,7 @@ casperChai = (_chai, utils) ->
     )
 
   # true when given selector is loaded
-  _chai.Assertion.addProperty 'visible', () ->
+  _addProperty 'visible', () ->
     selector = @_obj
     expect(selector).to.be.inDOM
     @assert(casper.visible(selector),
@@ -43,7 +51,7 @@ casperChai = (_chai, utils) ->
     )
 
   # true when document is loaded
-  _chai.Assertion.addProperty 'loaded', ->
+  _addProperty 'loaded', ->
     resourceTest = @_obj
     @assert(casper.resourceExists(resourceTest),
         'expected resource #{this} to exist, but it does not',
@@ -52,7 +60,7 @@ casperChai = (_chai, utils) ->
 
   # true when the the title matches the given regular expression,
   # or where a string is used match that string exactly.
-  _chai.Assertion.addProperty 'matchTitle', ->
+  _addProperty 'matchTitle', ->
     matcher = @_obj
 
     title = casper.getTitle()
@@ -61,7 +69,7 @@ casperChai = (_chai, utils) ->
         'expected title #{this} to not match #{exp}, but it did',
     )
 
-  _chai.Assertion.addProperty 'matchCurrentUrl', ->
+  _addProperty 'matchCurrentUrl', ->
     matcher = @_obj
     currentUrl = casper.getCurrentUrl()
     @assert(_matches(matcher, currentUrl),
@@ -69,7 +77,7 @@ casperChai = (_chai, utils) ->
       'expected url #{exp} to not match #{this}, but it did'
     )
 
-  _chai.Assertion.addProperty 'textInDOM', ->
+  _addProperty 'textInDOM', ->
     needle = @_obj
     haystack = casper.evaluate ->
       document.body.textContent or document.body.innerText
@@ -79,7 +87,7 @@ casperChai = (_chai, utils) ->
       'expected text #{this} to not be in the document, but it was found'
     )
 
-  _chai.Assertion.addMethod 'textMatch', (matcher) ->
+  _addMethod 'textMatch', (matcher) ->
     selector = @_obj
     text = casper.fetchText(selector)
     @assert(_matches(matcher, text),
@@ -87,7 +95,7 @@ casperChai = (_chai, utils) ->
       "expected '#{selector}' to not match #{matcher}, but it did"
     )
 
-  _chai.Assertion.addMethod 'fieldValue', (givenValue) ->
+  _addMethod 'fieldValue', (givenValue) ->
     selector = @_obj
 
     if _.isString(selector)

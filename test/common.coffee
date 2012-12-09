@@ -1,4 +1,8 @@
-
+###
+# Unit-tests for Casper-Chai
+#
+###
+# TODO: Test 'loaded'
 
 describe "the Casper-Chai addons to Chai", ->
   before ->
@@ -47,6 +51,16 @@ describe "the Casper-Chai addons to Chai", ->
     it "does not match a partial title", ->
       casper.then ->
         expect("Title").to.not.matchTitle
+
+  describe "BDD 'should' framework", ->
+    it "should include the new asserts", ->
+      "#header_1".should.be.inDOM
+      "#header_X".should.not.be.inDOM
+
+  describe.skip "TDD 'assert' framework", ->
+    it "should work", ->
+      assert.inDOM("#header_1")
+
 
   describe "the matchCurrentUrl property", ->
     it "matches /simple.html/", ->

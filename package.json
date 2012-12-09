@@ -22,7 +22,7 @@
   },
   "main": "./build/casper-chai.js",
   "scripts": {
-    "test": "mocha",
+    "test": "cake test",
     "lint": "jshint ./lib"
   },
   "dependencies": {},

@@ -12,6 +12,7 @@ var fs          = require('fs'),
   serverPort    = 8523, // the port where we create a server
   testServer    = "http://localhost:"+serverPort,
   any_failures  = false, // true when there has been a failure
+  should,
   casper;
 
 
@@ -72,7 +73,8 @@ chai.Assertion.includeStack = true;
 
 // FIXME: the following throws
 //      RangeError: Maximum call stack size exceeded.
-// should = chai.should();
+//  if should is not in scope with 'var scope' up above
+should = chai.should();
 
 /*
  * Create the casper object we'll use for testing
@@ -145,7 +147,7 @@ function CasperReporter(runner) {
     console.log("\n" + indent(symbols.middot + " " + test.title));
   });
 
-  runner.on('pending', function(){
+  runner.on('pending', function(test) {
     console.log(indent("pending ".magenta + test.title));
   });
 
