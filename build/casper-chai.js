@@ -64,6 +64,12 @@ Copyright (C) 2012 Brian M Hunt
       });
       return this.assert(haystack.indexOf(needle) !== -1, 'expected text #{this} to be in the document, but it was not', 'expected text #{this} to not be in the document, but it was found');
     });
+    _chai.Assertion.addMethod('textMatch', function(matcher) {
+      var selector, text;
+      selector = this._obj;
+      text = casper.fetchText(selector);
+      return this.assert(_matches(matcher, text), "expected '" + selector + "' to match " + matcher + ", but it did not", "expected '" + selector + "' to not match " + matcher + ", but it did");
+    });
     return _chai.Assertion.addMethod('fieldValue', function(givenValue) {
       var get_remote_value, remoteValue, selector;
       selector = this._obj;

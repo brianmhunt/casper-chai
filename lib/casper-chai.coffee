@@ -79,6 +79,15 @@ casperChai = (_chai, utils) ->
       'expected text #{this} to not be in the document, but it was found'
     )
 
+  _chai.Assertion.addMethod 'textMatch', (matcher) ->
+    selector = @_obj
+    text = casper.fetchText(selector)
+    @assert(_matches(matcher, text),
+      "expected '#{selector}' to match #{matcher}, but it did not",
+      "expected '#{selector}' to not match #{matcher}, but it did"
+    )
+    
+
   _chai.Assertion.addMethod 'fieldValue', (givenValue) ->
     selector = @_obj
 
@@ -101,9 +110,6 @@ casperChai = (_chai, utils) ->
       "expected field(s) #{selector} to not have value #{givenValue}, " +
         "but it was"
     )
-
-
-
 
 #
 # "Module systems magic dance"

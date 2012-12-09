@@ -13,24 +13,32 @@
 #
 # Based on sample cakefile at
 # https://github.com/kompiro/Cakefile-Sample/
+#
 
-{spawn} = require 'child_process'
-{log} = require 'util'
-fs = require 'fs'
-glob = require 'glob'
-_ = require 'lodash'
-coffee = require 'coffee-script'
+try
+  {spawn} = require 'child_process'
+  {log} = require 'util'
+  fs = require 'fs'
+  glob = require 'glob'
+  _ = require 'lodash'
+  coffee = require 'coffee-script'
+catch err
+  console.log "\n Package loading issue; Perhaps `npm install` needs to be run."
+  throw new Error("A package could not be loaded: #{err}")
+
 
 SRC_DIR = 'lib'
 COFFEE_SRC = ['casper-chai.coffee']
 DEST = 'build/casper-chai'
 UGLIFY_CMD = './node_modules/uglify-js2/bin/uglifyjs2'
 
+
 task 'test', 'Print some pretty colors to the console', (options) ->
   cmd = 'casperjs'
   args = ["test/run.js"]
   log "Cake is running: #{cmd} #{args.join(" ")}"
   spawn cmd, args, customFds: [0, 1, 2]
+
 
 task 'deploy', 'Publish a patch release on npm (increments patch number)', ->
   semver = require('semver')
@@ -52,7 +60,6 @@ task 'deploy', 'Publish a patch release on npm (increments patch number)', ->
   # publish
   args = ['publish']
   spawn "npm", args, customFds: [0,1,2]
-
 
 
 task 'toast', "Build the project into the build/ dir", (options) ->
