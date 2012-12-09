@@ -98,6 +98,10 @@ Add extensions to Chai with:
     casper_chai = require('casper-chai');
     chai.use(casper_chai);
 
+To build locally, clone the project and run `cake toast test` in the
+project directory. You may have to run `npm install` to get dependencies
+(which, obviously, requires [npm][] to be installed), and make sure `cake` is
+available - which should be possible by running `npm install -g coffee-script`.
 
 ### AMD
 
