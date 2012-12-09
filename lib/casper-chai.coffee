@@ -34,7 +34,7 @@ casperChai = (_chai, utils) ->
     )
 
   # true when given selector is loaded
-  _chai.Assertion.addProperty 'isVisible', () ->
+  _chai.Assertion.addProperty 'visible', () ->
     selector = @_obj
     expect(selector).to.be.inDOM
     @assert(casper.visible(selector),
@@ -43,7 +43,7 @@ casperChai = (_chai, utils) ->
     )
 
   # true when document is loaded
-  _chai.Assertion.addProperty 'isLoaded', ->
+  _chai.Assertion.addProperty 'loaded', ->
     resourceTest = @_obj
     @assert(casper.resourceExists(resourceTest),
         'expected resource #{this} to exist, but it does not',
@@ -86,7 +86,6 @@ casperChai = (_chai, utils) ->
       "expected '#{selector}' to match #{matcher}, but it did not",
       "expected '#{selector}' to not match #{matcher}, but it did"
     )
-    
 
   _chai.Assertion.addMethod 'fieldValue', (givenValue) ->
     selector = @_obj

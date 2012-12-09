@@ -299,6 +299,7 @@ require('webserver').create().listen(serverPort, function (request, response) {
 
   console.log("[testServer:".inverse + fileToRead.inverse + "]".inverse);
 
+  // FIXME 404 when not found
   content = fs.read(fileToRead);
   response.write(content);
 

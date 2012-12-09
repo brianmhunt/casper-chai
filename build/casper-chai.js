@@ -33,13 +33,13 @@ Copyright (C) 2012 Brian M Hunt
       selector = this._obj;
       return this.assert(casper.exists(selector), 'expected selector #{this} to be in the DOM, but it was not', 'expected selector #{this} to not be in the DOM, but it was');
     });
-    _chai.Assertion.addProperty('isVisible', function() {
+    _chai.Assertion.addProperty('visible', function() {
       var selector;
       selector = this._obj;
       expect(selector).to.be.inDOM;
       return this.assert(casper.visible(selector), 'expected selector #{this} to be visible, but it was not', 'expected selector #{this} to not be, but it was');
     });
-    _chai.Assertion.addProperty('isLoaded', function() {
+    _chai.Assertion.addProperty('loaded', function() {
       var resourceTest;
       resourceTest = this._obj;
       return this.assert(casper.resourceExists(resourceTest), 'expected resource #{this} to exist, but it does not', 'expected resource #{this} to not exist, but it does');

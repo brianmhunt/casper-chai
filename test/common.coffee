@@ -13,7 +13,7 @@ describe "the Casper-Chai addons to Chai", ->
       casper.then ->
         expect("#not_in_dom").to.not.be.inDOM
 
-  describe "the isVisible property", ->
+  describe "the visible property", ->
     it "matches a visible property", ->
       casper.then ->
         expect("#header_1").to.be.visible
