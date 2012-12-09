@@ -99,13 +99,13 @@ chai = require("../contrib/chai");
 assert = chai.assert;
 expect = chai.expect;
 
+// Note: due to a bug in PhantomJS the following throws
+//      RangeError: Maximum call stack size exceeded.
+// if `should` is not in scope with 'var scope' up above
+should = chai.should();
+
 // we don't get much debugging info on the console, so this can be helpful
 chai.Assertion.includeStack = true;
-
-// FIXME: the following throws
-//      RangeError: Maximum call stack size exceeded.
-//  if should is not in scope with 'var scope' up above
-should = chai.should();
 
 /*
  * Create the casper object we'll use for testing
@@ -223,9 +223,8 @@ mocha.setup({
 /*
  * After every Mocha test we flush the Casper 'steps' stack.
  *
- * Because afterEach calls the asynchronous Casper steps, the actual
- * those tests can be synchronous. All Casper tests will occur in this
- * afterEach.
+ * Because afterEach calls the asynchronous Casper steps, the actual tests can
+ * be synchronous. All Casper tests will occur in this afterEach.
  */
 afterEach(function (done) {
   // There is no need to print here b/c mocha test emit will
