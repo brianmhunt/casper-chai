@@ -84,7 +84,7 @@ task 'toast', "Build the project into the build/ dir", (options) ->
     return "\n// -- from: #{src_file} -- \\\\\n" + js
   ).join("\n")
 
-  contents = source
+  contents = "/* casper-chai version #{version} */\n#{source}"
 
   console.log "Writing #{DEST}.js"
   fs.writeFileSync("#{DEST}.js", contents, 'utf8')

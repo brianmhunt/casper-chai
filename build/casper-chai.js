@@ -1,3 +1,4 @@
+/* casper-chai version 0.1.3 */
 
 // -- from: lib/casper-chai.coffee -- \\
 
