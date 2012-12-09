@@ -26,7 +26,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   <thead>
     <th>Test</th>
     <th>True when ... </th>
-    <th>Examples</th>
+    <th>Examples (BDD, should & expect)</th>
   </thead>
   <tbody>
     <tr>
@@ -41,7 +41,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
     <tr>
       <td>inDOM </td>
       <td>when the given selector is in the DOM</td>
-      <td><code>expect("#target").to.be.inDOM;</code></td>
+      <td><code>"#target".should.be.inDOM;</code></td>
     </tr>
     <tr>
       <td>loaded</td>
@@ -66,7 +66,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
     <tr>
       <td>textInDOM</td>
       <td>the text can be found in the DOM</td>
-      <td><code>expect("search").to.be.textInDOM</code></td>
+      <td><code>"search".should.be.textInDOM</code></td>
     </tr>
     <tr>
       <td>textMatch(expression)</td>

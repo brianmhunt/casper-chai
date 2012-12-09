@@ -15,9 +15,10 @@ Copyright (C) 2012 Brian M Hunt
   var casperChai;
 
   casperChai = function(_chai, utils) {
-    var methods, properties, _addMethod, _addProperty, _matches;
+    var assert, methods, properties, _addMethod, _addProperty, _matches;
     properties = [];
     methods = [];
+    assert = _chai.assert;
     _matches = function(string_or_regex, value) {
       var regex;
       if (typeof string_or_regex === 'string') {
@@ -29,7 +30,6 @@ Copyright (C) 2012 Brian M Hunt
       }
       return regex.test(value);
     };
-    assert.casper = {};
     _addProperty = function(name, func) {
       return _chai.Assertion.addProperty(name, func);
     };

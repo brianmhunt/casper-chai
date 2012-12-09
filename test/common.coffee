@@ -58,7 +58,7 @@ describe "the Casper-Chai addons to Chai", ->
       "#header_X".should.not.be.inDOM
 
   describe.skip "TDD 'assert' framework", ->
-    it "should work", ->
+    it "should have bound methods inDOM and others", ->
       assert.inDOM("#header_1")
 
 

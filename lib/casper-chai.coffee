@@ -13,6 +13,7 @@ Copyright (C) 2012 Brian M Hunt
 casperChai = (_chai, utils) ->
   properties = []
   methods = []
+  assert = _chai.assert
 
   _matches = (string_or_regex, value) ->
     if typeof string_or_regex == 'string'
@@ -24,13 +25,13 @@ casperChai = (_chai, utils) ->
         + " or regular expression.")
     return regex.test(value)
 
-  assert.casper = {}
-    
   _addProperty = (name, func) ->
     _chai.Assertion.addProperty(name, func)
+    # assert[name] = Function.bind(assert, func)
 
   _addMethod = (name, method) ->
     _chai.Assertion.addMethod(name, method)
+    # assert[name] = Function.bind(assert, method)
 
   # use "inDOM" instead of "exist" so we don't conflict with
   # chai.js bdd
