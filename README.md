@@ -30,9 +30,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </thead>
   <tbody>
     <tr>
-      <td>
-        <code>fieldValue(value)</code>
-      </td>
+      <td>fieldValue(value)</td>
       <td>
         the named input provided has the given value
       </td>
@@ -41,44 +39,44 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       </td>
     </tr>
     <tr>
-      <td>
-      <code>inDOM</code>
-      </td>
+      <td>inDOM </td>
       <td>when the given selector is in the DOM</td>
-      <td><code>expect("#target").to.be.inDOM;</code>/td>
+      <td><code>expect("#target").to.be.inDOM;</code></td>
     </tr>
     <tr>
-      <td><code>loaded</code>/td>
+      <td>loaded</td>
       <td>when the given resource exists</td>
-      <td><code>expect("styles.css").to.be.loaded</code>/td>
+      <td><code>expect("styles.css").to.be.loaded</code></td>
     </tr>
     <tr>
-      <td><code>isVisible</code>/td>
+      <td>visible</td>
       <td>the selector matches a visible element</td>
-      <td><code>expect("#hidden").to.not.be.visible</code>/td>
+      <td><code>expect("#hidden").to.not.be.visible</code></td>
     </tr>
     <tr>
-      <td><code>matchCurrentUrl</code>/td>
+      <td>matchCurrentUrl</td>
       <td>the current URL matches</td>
-      <td><code>expect(/https:///).to.matchCurrentUrl</code>/td>
+      <td><code>expect(/https:///).to.matchCurrentUrl</code></td>
     </tr>
     <tr>
-      <td><code>matchTitle</code>/td>
+      <td>matchTitle</td>
       <td>the current Title matches</td>
-      <td><code>expect("Google").to.matchTitle</code>/td>
+      <td><code>expect("Google").to.matchTitle</code></td>
     </tr>
     <tr>
-      <td><code>textInDOM</code>/td>
+      <td>textInDOM</td>
       <td>the text can be found in the DOM</td>
-      <td><code>expect("search").to.be.textInDOM</code>/td>
+      <td><code>expect("search").to.be.textInDOM</code></td>
     </tr>
     <tr>
-      <td><code>textMatch(expression)</code>/td>
+      <td>textMatch(expression)</td>
       <td>
         the text of the given selector matches the expression (a string
         or regular expression).
       </td>
-      <td><code>expect("#element").to.have.textMatch(/case InSenSitIvE/i)</code>/td>
+      <td>
+      <code>expect("#element").to.have.textMatch(/case InSenSitIvE/i)</code>
+      </td>
     </tr>
   </tbody>
 </table>
@@ -86,7 +84,9 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
 ### Installation
 
 Casper-Chai can be installed with [npm][] using `npm install casper-chai`, or
-including `build/casper-chai.js` in a directory `require` will find it.
+including
+[`build/casper-chai.js`](https://raw.github.com/brianmhunt/casper-chai/master/build/casper-chai.js)
+in a directory `require` will find it.
 
 Add extensions to Chai with:
 
