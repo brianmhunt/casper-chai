@@ -56,7 +56,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
     <tr>
       <td>matchCurrentUrl</td>
       <td>the current URL matches</td>
-      <td><code>expect(/https:///).to.matchCurrentUrl</code></td>
+      <td><code>expect(/https:\/\//).to.matchCurrentUrl</code></td>
     </tr>
     <tr>
       <td>matchTitle</td>
@@ -81,6 +81,11 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </tbody>
 </table>
 
+For more examples, if you are cool with
+[CoffeeScript](http://coffeescript.org/), check out the [unit
+tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee).
+
+
 ### Installation
 
 Casper-Chai can be installed with [npm][] using `npm install casper-chai`, or
@@ -92,6 +97,7 @@ Add extensions to Chai with:
 
     casper_chai = require('casper-chai');
     chai.use(casper_chai);
+
 
 ### AMD
 
