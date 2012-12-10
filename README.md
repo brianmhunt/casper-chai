@@ -1,4 +1,4 @@
-# Casper.JS Assertions for Chai
+# Casper.JS Assertions for Chai [![Build Status](https://secure.travis-ci.org/brianmhunt/casper-chai.png?branch=master)](https://travis-ci.org/brianmhunt/casper-chai)
 
 **Casper–Chai** provides a set of custom assertions for use with [CasperJS][].
 You get all the benefits of [Chai][] to test with CasperJS.
