@@ -29,54 +29,54 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </thead>
   <tbody>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#fieldvalue'>fieldValue(value)</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#fieldvalue'>fieldValue(value)</a></td>
       <td>
         the named input provided has the given value
       </td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#indom'>inDOM</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#indom'>inDOM</a></td>
       <td>when the given selector is in the DOM</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#loaded'>loaded</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#loaded'>loaded</a></td>
       <td>when the given resource exists</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#matchcurrenturl'>matchCurrentUrl</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#matchcurrenturl'>matchCurrentUrl</a></td>
       <td>the current URL matches</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#matchonremote'>matchOnRemote</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#matchonremote'>matchOnRemote</a></td>
       <td>compare the remote evaluation to the given expression</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#matchtitle'>matchTitle</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#matchtitle'>matchTitle</a></td>
       <td>the current Title matches</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#textindom'>textInDOM</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#textindom'>textInDOM</a></td>
       <td>the text can be found in the DOM</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#textmatch)'>textMatch(expression)</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#textmatch)'>textMatch(expression)</a></td>
       <td>
         the text of the given selector matches the expression (a string
         or regular expression).
       </td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#trueonremote'>trueOnRemote</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#trueonremote'>trueOnRemote</a></td>
       <td>the remote expression evaluates to something truthy</td>
     </tr>
     <tr>
-      <td><a href='blob/master/build/casper-chai.md#visible'>visible</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#visible'>visible</a></td>
       <td>the selector matches a visible element</td>
     </tr>
   </tbody>
 </table>
 
-More [documentation and examples](blob/master/build/casper-chai.md).
+More [documentation and examples](casper-chai/blob/master/build/casper-chai.md).
 
 For even more examples, if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
