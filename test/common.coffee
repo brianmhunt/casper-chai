@@ -140,22 +140,46 @@ describe "Casper-Chai addons to Chai", ->
         expect(-> typeof jQuery == typeof undefined).to.be.trueOnRemote
 
   describe "the matchOnRemote", ->
-    it "compares equal strings", ->
+    it "correctly compares equal strings", ->
       casper.then ->
         expect("return \"hello\"").to.matchOnRemote("hello")
 
-    it "compares string to regular expression", ->
+    it "correctly compares string to regular expression", ->
       casper.then ->
         expect("return \"hello\"").to.matchOnRemote(/HELLO/i)
 
-    it "compares simple expression to string", ->
+    it "correctly compares simple expression to string", ->
       casper.then ->
         expect("\"hello\"").to.matchOnRemote("hello")
 
-    it "compares unequal strings", ->
+    it "correctly compares unequal strings", ->
       casper.then ->
         expect("\"hello\"").to.not.matchOnRemote("hZllo")
         expect(-> "hello").to.not.matchOnRemote(/hZllo/)
+
+    it "compares arrays with _.isEqual", ->
+      casper.then ->
+        expect("[1,2,3]").to.matchOnRemote([1,2,3])
+
+        # TODO: raw object/array [1,2,3].should.matchOnRemote?
+        (-> [42,16,17]).should.matchOnRemote([42,16,17])
+
+    it "compares unequal arrays", ->
+      casper.then ->
+        (-> [42,16,17]).should.not.matchOnRemote([42,17,16])
+
+    it "compares integers (with _.isEqual)", ->
+      casper.then ->
+        expect(-> 42).to.matchOnRemote(42)
+
+    it "compares floats (with _.isEqual)", ->
+      casper.then ->
+        # -0.29999999999999893 ~= -0.3
+        expect(-> 13.3 - 13.6).to.matchOnRemote(13.3 - 13.6)
+
+    it "compares objects (with _.isEqual)", ->
+      casper.then ->
+        expect(-> {a:1,b:2}).to.matchOnRemote({b:2,a:1})
 
   describe "trivial tests", ->
     before -> casper.open "simple.html"

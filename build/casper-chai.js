@@ -1,11 +1,12 @@
-/* casper-chai version 0.1.3 */
+/* casper-chai version 0.1.4 */
 
 // -- from: lib/casper-chai.coffee -- \\
 
 /*
-Chai assertions for CasperJS
+  Chai assertions for CasperJS
+  ============================
 
-Copyright (C) 2012 Brian M Hunt
+  Copyright (C) 2012 Brian M Hunt
 
   Repository: http://github.com/brianmhunt/casper-chai.git
   License: MIT (see LICENSE.txt)
@@ -25,21 +26,6 @@ Copyright (C) 2012 Brian M Hunt
         ---------
     */
 
-    /*
-        Returns true if a given string_or_regex matches the given value
-    */
-
-    _matches = function(string_or_regex, value) {
-      var regex;
-      if (typeof string_or_regex === 'string') {
-        regex = new RegExp("^" + string_or_regex + "$");
-      } else if (_.isRegExp(string_or_regex)) {
-        regex = string_or_regex;
-      } else {
-        throw new Error("Test received " + string_or_regex + ", but expected string", +" or regular expression.");
-      }
-      return regex.test(value);
-    };
     _addProperty = function(name, func) {
       return _chai.Assertion.addProperty(name, func);
     };
@@ -47,10 +33,13 @@ Copyright (C) 2012 Brian M Hunt
       return _chai.Assertion.addMethod(name, method);
     };
     /*
+        _exprAsFunction
+        ---------------
+    
         Given an expression, turn it in to something that can be
         evaluated remotely.
     
-        expr may be
+        `expr` may be
         
         1. a bare string e.g. "false" or "return true";
     
@@ -79,6 +68,35 @@ Copyright (C) 2012 Brian M Hunt
       return fn;
     };
     /*
+        _matches
+        --------
+    
+        Returns true if a `against` matches `value`. The `against` variable
+        can be a string or regular expression.
+    
+        If `isEqualFallback` is true then we also try `_.isEqual`.
+    */
+
+    _matches = function(against, value, isEqualFallback) {
+      var regex;
+      if (isEqualFallback == null) {
+        isEqualFallback = false;
+      }
+      if (typeof against === 'string') {
+        regex = new RegExp("^" + against + "$");
+      } else if (_.isRegExp(against)) {
+        regex = against;
+      } else if (isEqualFallback) {
+        if (toString.call(value) === "[object RuntimeArray]") {
+          value = _.toArray(value);
+        }
+        return _.isEqual(against, value);
+      } else {
+        throw new Error("Test received " + against + ", but expected string", +" or regular expression.");
+      }
+      return regex.test(value);
+    };
+    /*
         Chai Tests
         ----------
     
@@ -87,9 +105,17 @@ Copyright (C) 2012 Brian M Hunt
 
     /*
         fieldValue
-        ~~~~~~~~~~
+        ----------
     
-        Wraps the __utils__.getFieldValue(selector)
+        True when the named input provided has the given value.
+    
+        Wraps Casper's `__utils__.getFieldValue(selector)`.
+    
+        Examples:
+    
+        ```javascript
+        expect("name_of_input").to.have.fieldValue("123");
+        ```
     */
 
     _addMethod('fieldValue', function(givenValue) {
@@ -108,11 +134,38 @@ Copyright (C) 2012 Brian M Hunt
       });
       return this.assert(remoteValue === givenValue, ("expected field(s) " + selector + " to have value " + givenValue + ", ") + ("but it was " + remoteValue), ("expected field(s) " + selector + " to not have value " + givenValue + ", ") + "but it was");
     });
+    /*
+        inDOM
+        -----
+    
+        True when the given selector is in the DOM
+    
+    
+        ```javascript
+          "#target".should.be.inDOM;
+        ```
+    
+      Note: We use "inDOM" instead of "exist" so we don't conflict with
+      the chai.js BDD.
+    */
+
     _addProperty('inDOM', function() {
       var selector;
       selector = this._obj;
       return this.assert(casper.exists(selector), 'expected selector #{this} to be in the DOM, but it was not', 'expected selector #{this} to not be in the DOM, but it was');
     });
+    /*
+        loaded
+        ------
+    
+        True when the given resource exists in the phantom browser.
+    
+        ```javascript
+        expect("styles.css").to.not.be.loaded
+        "jquery-1.8.3".should.be.loaded
+        ```
+    */
+
     _addProperty('loaded', function() {
       var resourceTest;
       resourceTest = this._obj;
@@ -120,7 +173,18 @@ Copyright (C) 2012 Brian M Hunt
     });
     /*
         matchOnRemote
-        ~~~~~~~~~~~~~~
+        --------------
+    
+        Compare the remote evaluation to the given expression, and return
+        true when they match. The expression can be a string or a regular
+        expression. The evaluation is the same as for [trueOnRemote][].
+    
+        ```
+          expect("return 123").to.matchOnRemote(123)<br/>
+    
+          (function () { return typeof jQuery })
+            .should.not.matchOnRemote('undefined')
+        ```
     */
 
     _addMethod('matchOnRemote', function(matcher) {
@@ -128,20 +192,53 @@ Copyright (C) 2012 Brian M Hunt
       expr = this._obj;
       fn = _exprAsFunction(expr);
       remoteValue = casper.evaluate(fn);
-      return this.assert(_matches(matcher, remoteValue), "expected " + this._obj + " (" + fn + " = " + remoteValue + ") to match " + matcher, "expected " + this._obj + " (" + fn + ") to not match " + matcher + ", but it did");
+      return this.assert(_matches(matcher, remoteValue, true), "expected " + this._obj + " (" + fn + " = " + remoteValue + ") to match " + matcher, "expected " + this._obj + " (" + fn + ") to not match " + matcher + ", but it did");
     });
+    /*
+        matchTitle
+        ----------
+    
+        True when the the title matches the given regular expression,
+        or where a string is used match that string exactly.
+    
+        ```javascript
+        expect("Google").to.matchTitle;
+        ```
+    */
+
     _addProperty('matchTitle', function() {
       var matcher, title;
       matcher = this._obj;
       title = casper.getTitle();
       return this.assert(_matches(matcher, title), 'expected title #{this} to match #{exp}, but it did not', 'expected title #{this} to not match #{exp}, but it did');
     });
+    /*
+        matchCurrentUrl
+        ---------------
+        the current URL matches the given string or regular expression
+    
+        ```javascript
+          expect(/https:\/\//).to.matchCurrentUrl;
+        ```
+    */
+
     _addProperty('matchCurrentUrl', function() {
       var currentUrl, matcher;
       matcher = this._obj;
       currentUrl = casper.getCurrentUrl();
       return this.assert(_matches(matcher, currentUrl), 'expected url #{exp} to match #{this}, but it did not', 'expected url #{exp} to not match #{this}, but it did');
     });
+    /*
+        textInDOM
+        ---------
+    
+        The given text can be found in the phantom browser's DOM.
+    
+        ```javascript
+        "search".should.be.textInDOM</code></td>
+        ```
+    */
+
     _addProperty('textInDOM', function() {
       var haystack, needle;
       needle = this._obj;
@@ -150,6 +247,18 @@ Copyright (C) 2012 Brian M Hunt
       });
       return this.assert(haystack.indexOf(needle) !== -1, 'expected text #{this} to be in the document, but it was not', 'expected text #{this} to not be in the document, but it was found');
     });
+    /*
+        textMatch
+        ---------
+    
+        The text of the given selector matches the expression (a string
+        or regular expression).
+    
+        ```javascript
+          expect("#element").to.have.textMatch(/case InSenSitIvE/i);
+        ```
+    */
+
     _addMethod('textMatch', function(matcher) {
       var selector, text;
       selector = this._obj;
@@ -158,21 +267,31 @@ Copyright (C) 2012 Brian M Hunt
     });
     /*
         trueOnRemote
-        ~~~~~~~~~~~~
+        ------------
     
-        This property is true when the given expression is true on the remote.
+        The given expression evaluates to true on the remote page. Expression may
+        be a function, a function string, or a simple expression. Where a function
+        is passed in, the return value is tested. Where a simple expression is
+        passed in it is wrapped in 'function () {}', with a 'return' statement
+        added if one is not already included, and this wrapped function is
+        evaluated as an ordinary function would be.
     
-        For example:
+        ```javascript
+        "true".should.be.trueOnRemote;
     
-            "true".should.be.trueOnRemote
+        expect("true").to.be.trueOnRemote;
     
-        or
+        (function() { return false }).should.not.be.trueOnRemote;
     
-            (function() { return false }).should.not.be.trueOnRemote
+        expect("function () { return true }").to.be.trueOnRemote;
     
-        or
+        expect("return false").to.not.be.trueOnRemote;
     
-          expect("function () { return true }").to.be.trueOnRemote
+        (function () { return typeof jQuery == typeof void 0
+        }).should.be.trueOnRemote;
+    
+        expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
+        ```
     */
 
     _addProperty('trueOnRemote', function() {
@@ -182,6 +301,17 @@ Copyright (C) 2012 Brian M Hunt
       remoteValue = casper.evaluate(fn);
       return this.assert(remoteValue, "expected expression " + this._obj + " to be true, but it was " + remoteValue, "expected expression " + this._obj + " to not be true, but itw as " + remoteValue);
     });
+    /*
+      visible
+      -------
+    
+      The selector matches a visible element.
+    
+      ```javascript
+      expect("#hidden").to.not.be.visible
+      ```
+    */
+
     return _addProperty('visible', function() {
       var selector;
       selector = this._obj;

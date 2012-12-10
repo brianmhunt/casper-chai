@@ -1,7 +1,8 @@
 ###
-Chai assertions for CasperJS
+  Chai assertions for CasperJS
+  ============================
 
-Copyright (C) 2012 Brian M Hunt
+  Copyright (C) 2012 Brian M Hunt
 
   Repository: http://github.com/brianmhunt/casper-chai.git
   License: MIT (see LICENSE.txt)
@@ -20,21 +21,6 @@ casperChai = (_chai, utils) ->
     ---------
   ###
 
-  ###
-    Returns true if a given string_or_regex matches the given value
-  ###
-  _matches = (string_or_regex, value) ->
-    if typeof string_or_regex == 'string'
-      regex = new RegExp("^#{string_or_regex}$")
-    else if _.isRegExp(string_or_regex)
-      regex = string_or_regex
-    else
-      throw new Error("Test received #{string_or_regex}, but expected string"
-        + " or regular expression.")
-
-    # console.log("RegExp", regex, "value", value)
-    return regex.test(value)
-
   _addProperty = (name, func) ->
     _chai.Assertion.addProperty(name, func)
     # assert[name] = Function.bind(assert, func)
@@ -44,10 +30,13 @@ casperChai = (_chai, utils) ->
     # assert[name] = Function.bind(assert, method)
 
   ###
+    _exprAsFunction
+    ---------------
+
     Given an expression, turn it in to something that can be
     evaluated remotely.
 
-    expr may be
+    `expr` may be
     
     1. a bare string e.g. "false" or "return true";
 
@@ -80,6 +69,36 @@ casperChai = (_chai, utils) ->
     # console.log("expr: ", expr.yellow, "=>", fn.green)
 
     return fn
+
+  ###
+    _matches
+    --------
+
+    Returns true if a `against` matches `value`. The `against` variable
+    can be a string or regular expression.
+
+    If `isEqualFallback` is true then we also try `_.isEqual`.
+  ###
+  _matches = (against, value, isEqualFallback=false) ->
+    if typeof against == 'string'
+      regex = new RegExp("^#{against}$")
+    else if _.isRegExp(against)
+      regex = against
+    else if isEqualFallback
+      if toString.call(value) == "[object RuntimeArray]"
+        # normalize the RuntimeArray type. This type is what arrays returned
+        # from casper.evaluate tend to be, and _.isEqual will say it is
+        # not equal to an Array class even if the values are otherwise
+        # identical.
+        value = _.toArray(value)
+
+      return _.isEqual(against, value)
+    else
+      throw new Error("Test received #{against}, but expected string"
+        + " or regular expression.")
+
+    # console.log("RegExp", regex, "value", value)
+    return regex.test(value)
     
 
   ###
@@ -92,9 +111,17 @@ casperChai = (_chai, utils) ->
     
   ###
     fieldValue
-    ~~~~~~~~~~
+    ----------
 
-    Wraps the __utils__.getFieldValue(selector)
+    True when the named input provided has the given value.
+
+    Wraps Casper's `__utils__.getFieldValue(selector)`.
+
+    Examples:
+
+    ```javascript
+    expect("name_of_input").to.have.fieldValue("123");
+    ```
   ###
   _addMethod 'fieldValue', (givenValue) ->
     selector = @_obj
@@ -119,8 +146,21 @@ casperChai = (_chai, utils) ->
         "but it was"
     )
 
-  # use "inDOM" instead of "exist" so we don't conflict with
-  # chai.js bdd
+  ###
+    inDOM
+    -----
+
+    True when the given selector is in the DOM
+
+
+    ```javascript
+      "#target".should.be.inDOM;
+    ```
+
+  Note: We use "inDOM" instead of "exist" so we don't conflict with
+  the chai.js BDD.
+
+  ###
   _addProperty 'inDOM', () ->
     selector = @_obj
     @assert(casper.exists(selector),
@@ -128,7 +168,17 @@ casperChai = (_chai, utils) ->
         'expected selector #{this} to not be in the DOM, but it was'
     )
 
-  # true when document is loaded
+  ###
+    loaded
+    ------
+
+    True when the given resource exists in the phantom browser.
+
+    ```javascript
+    expect("styles.css").to.not.be.loaded
+    "jquery-1.8.3".should.be.loaded
+    ```
+  ###
   _addProperty 'loaded', ->
     resourceTest = @_obj
     @assert(casper.resourceExists(resourceTest),
@@ -138,7 +188,18 @@ casperChai = (_chai, utils) ->
 
   ###
     matchOnRemote
-    ~~~~~~~~~~~~~~
+    --------------
+
+    Compare the remote evaluation to the given expression, and return
+    true when they match. The expression can be a string or a regular
+    expression. The evaluation is the same as for [trueOnRemote][].
+
+    ```
+      expect("return 123").to.matchOnRemote(123)<br/>
+
+      (function () { return typeof jQuery })
+        .should.not.matchOnRemote('undefined')
+    ```
   ###
   _addMethod 'matchOnRemote', (matcher) ->
     expr = @_obj
@@ -147,13 +208,22 @@ casperChai = (_chai, utils) ->
 
     remoteValue = casper.evaluate(fn)
 
-    @assert(_matches(matcher, remoteValue),
+    @assert(_matches(matcher, remoteValue, true),
       "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
       "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
     )
 
-  # true when the the title matches the given regular expression,
-  # or where a string is used match that string exactly.
+  ###
+    matchTitle
+    ----------
+
+    True when the the title matches the given regular expression,
+    or where a string is used match that string exactly.
+
+    ```javascript
+    expect("Google").to.matchTitle;
+    ```
+  ###
   _addProperty 'matchTitle', ->
     matcher = @_obj
 
@@ -163,6 +233,15 @@ casperChai = (_chai, utils) ->
         'expected title #{this} to not match #{exp}, but it did',
     )
 
+  ###
+    matchCurrentUrl
+    ---------------
+    the current URL matches the given string or regular expression
+
+    ```javascript
+      expect(/https:\/\//).to.matchCurrentUrl;
+    ```
+  ###
   _addProperty 'matchCurrentUrl', ->
     matcher = @_obj
     currentUrl = casper.getCurrentUrl()
@@ -171,6 +250,16 @@ casperChai = (_chai, utils) ->
       'expected url #{exp} to not match #{this}, but it did'
     )
 
+  ###
+    textInDOM
+    ---------
+
+    The given text can be found in the phantom browser's DOM.
+
+    ```javascript
+    "search".should.be.textInDOM</code></td>
+    ```
+  ###
   _addProperty 'textInDOM', ->
     needle = @_obj
     haystack = casper.evaluate ->
@@ -181,6 +270,17 @@ casperChai = (_chai, utils) ->
       'expected text #{this} to not be in the document, but it was found'
     )
 
+  ###
+    textMatch
+    ---------
+
+    The text of the given selector matches the expression (a string
+    or regular expression).
+
+    ```javascript
+      expect("#element").to.have.textMatch(/case InSenSitIvE/i);
+    ```
+  ###
   _addMethod 'textMatch', (matcher) ->
     selector = @_obj
     text = casper.fetchText(selector)
@@ -191,21 +291,31 @@ casperChai = (_chai, utils) ->
 
   ###
     trueOnRemote
-    ~~~~~~~~~~~~
+    ------------
 
-    This assertion passes when the given expression is true on the remote.
+    The given expression evaluates to true on the remote page. Expression may
+    be a function, a function string, or a simple expression. Where a function
+    is passed in, the return value is tested. Where a simple expression is
+    passed in it is wrapped in 'function () {}', with a 'return' statement
+    added if one is not already included, and this wrapped function is
+    evaluated as an ordinary function would be.
 
-    For example:
+    ```javascript
+    "true".should.be.trueOnRemote;
 
-        "true".should.be.trueOnRemote
+    expect("true").to.be.trueOnRemote;
 
-    or
+    (function() { return false }).should.not.be.trueOnRemote;
 
-        (function() { return false }).should.not.be.trueOnRemote
+    expect("function () { return true }").to.be.trueOnRemote;
 
-    or
+    expect("return false").to.not.be.trueOnRemote;
 
-      expect("function () { return true }").to.be.trueOnRemote
+    (function () { return typeof jQuery == typeof void 0
+    }).should.be.trueOnRemote;
+
+    expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
+    ```
   ###
   _addProperty 'trueOnRemote', () ->
     expr = @_obj
@@ -221,7 +331,17 @@ casperChai = (_chai, utils) ->
       "expected expression #{@_obj} to not be true, but itw as #{remoteValue}"
     )
 
-  # true when given selector is loaded
+  ###
+  visible
+  -------
+
+  The selector matches a visible element.
+
+  ```javascript
+  expect("#hidden").to.not.be.visible
+  ```
+
+  ###
   _addProperty 'visible', () ->
     selector = @_obj
     expect(selector).to.be.inDOM
@@ -229,7 +349,6 @@ casperChai = (_chai, utils) ->
         'expected selector #{this} to be visible, but it was not',
         'expected selector #{this} to not be, but it was'
     )
-
 
 
 #
