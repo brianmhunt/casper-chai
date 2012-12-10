@@ -191,7 +191,7 @@ casperChai = (_chai, utils) ->
     [`trueOnRemote`](#trueonremote).
 
     ```javascript
-    expect("return 123").to.matchOnRemote(123)<br/>
+    expect("return 123").to.matchOnRemote(123)
 
     "typeof jQuery".should.not.matchOnRemote('undefined')
 
