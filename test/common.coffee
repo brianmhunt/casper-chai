@@ -172,6 +172,10 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect(-> 42).to.matchOnRemote(42)
 
+    it "compares returned value with a regular expression", ->
+      casper.then ->
+        expect(-> "aBcDe").to.matchOnRemote(/AbCdE/i)
+
     it "compares floats (with _.isEqual)", ->
       casper.then ->
         # -0.29999999999999893 ~= -0.3

@@ -59,7 +59,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       <td>the text can be found in the DOM</td>
     </tr>
     <tr>
-      <td><a href='casper-chai/blob/master/build/casper-chai.md#textmatch)'>textMatch(expression)</a></td>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#textmatch'>textMatch(expression)</a></td>
       <td>
         the text of the given selector matches the expression (a string
         or regular expression).

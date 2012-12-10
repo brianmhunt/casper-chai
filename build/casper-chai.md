@@ -10,28 +10,6 @@ License: MIT (see LICENSE.txt)
 
 
 
-Utilities
----------
-#### _exprAsFunction
-
-Given an expression, turn it in to something that can be
-evaluated remotely.
-
-`expr` may be
-
-1. a bare string e.g. "false" or "return true";
-
-2. a function string e.g. "function () { return true }"
-
-3. an actual function e.g. function () { return 'hello' }
-#### _matches
-
-Returns true if a `against` matches `value`. The `against` variable
-can be a string or regular expression.
-
-If `isEqualFallback` is true then we also try `_.isEqual`.
-
-
 Chai Tests
 ----------
 
@@ -78,6 +56,8 @@ expression. The evaluation is the same as for
 expect("return 123").to.matchOnRemote(123)<br/>
 
 "typeof jQuery".should.not.matchOnRemote('undefined')
+
+"123.toString()".should.matchOnRemote(/\d+/)
 ```
 
 or an example in CoffeeScript

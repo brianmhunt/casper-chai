@@ -16,10 +16,10 @@ casperChai = (_chai, utils) ->
   methods = []
   assert = _chai.assert
 
-  ###
-    Utilities
-    ---------
-  ###
+  #
+  #  Utilities
+  #  ---------
+  #
 
   _addProperty = (name, func) ->
     _chai.Assertion.addProperty(name, func)
@@ -29,20 +29,20 @@ casperChai = (_chai, utils) ->
     _chai.Assertion.addMethod(name, method)
     # assert[name] = Function.bind(assert, method)
 
-  ###
-    @@@@ _exprAsFunction
-
-    Given an expression, turn it in to something that can be
-    evaluated remotely.
-
-    `expr` may be
-    
-    1. a bare string e.g. "false" or "return true";
-
-    2. a function string e.g. "function () { return true }"
-
-    3. an actual function e.g. function () { return 'hello' }
-  ###
+  #
+  #  _exprAsFunction
+  #
+  #  Given an expression, turn it in to something that can be
+  #  evaluated remotely.
+  #
+  # `expr` may be
+  #
+  # 1. a bare string e.g. "false" or "return true";
+  #
+  # 2. a function string e.g. "function () { return true }"
+  #
+  # 3. an actual function e.g. function () { return 'hello' }
+  #
   _exprAsFunction = (expr) ->
     if _.isFunction(expr)
       fn = expr
@@ -69,14 +69,14 @@ casperChai = (_chai, utils) ->
 
     return fn
 
-  ###
-    @@@@ _matches
-
-    Returns true if a `against` matches `value`. The `against` variable
-    can be a string or regular expression.
-
-    If `isEqualFallback` is true then we also try `_.isEqual`.
-  ###
+  #
+  # _matches
+  #
+  #  Returns true if a `against` matches `value`. The `against` variable
+  #  can be a string or regular expression.
+  #
+  #  If `isEqualFallback` is true then we also try `_.isEqual`.
+  #
   _matches = (against, value, isEqualFallback=false) ->
     if typeof against == 'string'
       regex = new RegExp("^#{against}$")
@@ -194,6 +194,8 @@ casperChai = (_chai, utils) ->
     expect("return 123").to.matchOnRemote(123)<br/>
 
     "typeof jQuery".should.not.matchOnRemote('undefined')
+
+    "123.toString()".should.matchOnRemote(/\d+/)
     ```
     
     or an example in CoffeeScript
