@@ -5,7 +5,7 @@ node_js:
 before_script: 
 - npm install
 - sudo npm install -g coffee-script
-- wget https://github.com/n1k0/casperjs/archive/1.0.0-RC4.tar.gz -nv -O - | tar zxv
+- wget https://github.com/n1k0/casperjs/archive/1.0.0-RC4.tar.gz -nv -O - | tar zx
 - sudo ln -s `pwd`/casperjs-1.0.0-RC4/bin/casperjs /usr/local/bin/casperjs
 - phantomjs --version
 - casperjs --version
