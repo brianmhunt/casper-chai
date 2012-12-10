@@ -25,7 +25,6 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
 <table>
   <thead>
     <th>Test</th>
-    <th>True when ... </th>
     <th>Examples (BDD, should & expect)</th>
   </thead>
   <tbody>
@@ -67,10 +66,10 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       expression. The evaluation is the same as for <code>trueOnRemote</code>.
       </td>
       <td>
-        <pre><code>
-        expect("return 123").to.matchOnRemote(123)
+        <code>
+        expect("return 123").to.matchOnRemote(123)<br/>
         (function () { return typeof jQuery}).should.not.matchOnRemote('undefined')
-        </code></pre>
+        </code>
       </td>
     </tr>
     <tr>
@@ -102,12 +101,13 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       this wrapped function is evaluated as an ordinary function would be.
     </td>
     <td>
-    <pre><code>
-      expect("true").to.be.trueOnRemote
-      expect("return false").to.not.be.trueOnRemote
-      (function () { return typeof jQuery == typeof void 0 }).should.be.true
-      expect("function () { return 1 == 0 }").to.not.be.trueOnRemote
-    </code></pre>
+    <code>
+      expect("true").to.be.trueOnRemote<br/>
+      expect("return false").to.not.be.trueOnRemote<br/>
+      (function () { return typeof jQuery == typeof void 0
+      }).should.be.true<br/>
+      expect("function () { return 1 == 0 }").to.not.be.trueOnRemote<br/>
+    </code>
     </td>
     </tr>
   </tbody>
