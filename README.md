@@ -24,96 +24,61 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
 
 <table>
   <thead>
-    <th>Name and description</th>
-    <th>Examples (BDD, should & expect)</th>
+    <th>Name</th>
+    <th>Description</th>
   </thead>
   <tbody>
     <tr>
-      <td><h3>fieldValue(value)</h3>
+      <td>[fieldValue](build/casper-chai.md#fieldvalue)(value)</td>
+      <td>
         the named input provided has the given value
       </td>
+    </tr>
+    <tr>
+      <td>[inDOM](build/casper-chai.md#indom)</td>
+      <td>when the given selector is in the DOM</td>
+    </tr>
+    <tr>
+      <td>[loaded](build/casper-chai.md#loaded)</td>
+      <td>when the given resource exists</td>
+    </tr>
+    <tr>
+      <td>[matchCurrentUrl](build/casper-chai.md#matchcurrenturl)</td>
+      <td>the current URL matches</td>
+    </tr>
+    <tr>
+      <td>[matchOnRemote](build/casper-chai.md#matchonremote)</td>
+      <td>compare the remote evaluation to the given expression</td>
+    </tr>
+    <tr>
+      <td>[matchTitle](build/casper-chai.md#matchtitle)</td>
+      <td>the current Title matches</td>
+    </tr>
+    <tr>
+      <td>[textInDOM](build/casper-chai.md#textindom)</td>
+      <td>the text can be found in the DOM</td>
+    </tr>
+    <tr>
+      <td>[textMatch](build/casper-chai.md#textmatch)(expression)</td>
       <td>
-        <code>expect("name_of_input").to.have.fieldValue("123");</code>
-      </td>
-    </tr>
-    <tr>
-      <td><h3>inDOM</h3>
-      when the given selector is in the DOM</td>
-      <td><code>"#target".should.be.inDOM;</code></td>
-    </tr>
-    <tr>
-      <td><h3>loaded</h3>
-      when the given resource exists</td>
-      <td>
-      <code>expect("styles.css").to.not.be.loaded<br/>
-        "jquery-1.8.3".should.be.loaded
-      </code></td>
-    </tr>
-    <tr>
-      <td><h3>matchCurrentUrl</h3>
-      the current URL matches</td>
-      <td><code>expect(/https:\/\//).to.matchCurrentUrl</code></td>
-    </tr>
-    <tr>
-      <td><h3>matchOnRemote</h3>
-      compare the remote evaluation to the given expression, and return
-      true when they match. The expression can be a string or a regular
-      expression. The evaluation is the same as for <code>trueOnRemote</code>.
-      </td>
-      <td>
-        <code>
-        expect("return 123").to.matchOnRemote(123)<br/>
-        (function () { return typeof jQuery }).should.not.matchOnRemote('undefined')
-        </code>
-      </td>
-    </tr>
-    <tr>
-      <td><h3>matchTitle</h3>
-      the current Title matches</td>
-      <td><code>expect("Google").to.matchTitle</code></td>
-    </tr>
-    <tr>
-      <td><h3>textInDOM</h3>
-      the text can be found in the DOM</td>
-      <td><code>"search".should.be.textInDOM</code></td>
-    </tr>
-    <tr>
-      <td><h3>textMatch(expression)</h3>
         the text of the given selector matches the expression (a string
         or regular expression).
       </td>
-      <td>
-      <code>expect("#element").to.have.textMatch(/case InSenSitIvE/i)</code>
-      </td>
     </tr>
     <tr>
-    <td><h3>trueOnRemote</h3>
-      The given expression evaluates to true on the remote page. Expression
-      may be a function, a function string, or a simple expression. Where
-      a function is passed in, the return value is tested. Where a 
-      simple expression is passed in it is wrapped in 'function () {}',
-      with a 'return' statement added if one is not already included, and
-      this wrapped function is evaluated as an ordinary function would be.
-    </td>
-    <td>
-    <code>
-      expect("true").to.be.trueOnRemote<br/>
-      expect("return false").to.not.be.trueOnRemote<br/>
-      (function () { return typeof jQuery == typeof void 0
-      }).should.be.trueOnRemote<br/>
-      expect("function () { return 1 == 0 }").to.not.be.trueOnRemote<br/>
-    </code>
-    </td>
+      <td>[trueOnRemote](build/casper-chai.md#trueonremote)</td>
+      <td>the remote expression evaluates to something truthy</td>
     </tr>
     <tr>
-      <td><h3>visible</h3>
-      the selector matches a visible element</td>
-      <td><code>expect("#hidden").to.not.be.visible</code></td>
+      <td>[visible](build/casper-chai.md#visible)</td>
+      <td>the selector matches a visible element</td>
     </tr>
   </tbody>
 </table>
 
-For more examples, if you are cool with
+More [documentation and examples](build/casper-chai.md).
+
+For even more examples, if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
 tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee).
 
