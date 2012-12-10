@@ -30,8 +30,7 @@ casperChai = (_chai, utils) ->
     # assert[name] = Function.bind(assert, method)
 
   ###
-    _exprAsFunction
-    ---------------
+    @@@@ _exprAsFunction
 
     Given an expression, turn it in to something that can be
     evaluated remotely.
@@ -71,8 +70,7 @@ casperChai = (_chai, utils) ->
     return fn
 
   ###
-    _matches
-    --------
+    @@@@ _matches
 
     Returns true if a `against` matches `value`. The `against` variable
     can be a string or regular expression.
@@ -110,8 +108,8 @@ casperChai = (_chai, utils) ->
 
     
   ###
-    fieldValue
-    ----------
+    @@@@ fieldValue
+    
 
     True when the named input provided has the given value.
 
@@ -147,8 +145,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    inDOM
-    -----
+    @@@@ inDOM
 
     True when the given selector is in the DOM
 
@@ -169,8 +166,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    loaded
-    ------
+    @@@@ loaded
 
     True when the given resource exists in the phantom browser.
 
@@ -187,18 +183,22 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    matchOnRemote
-    --------------
+    @@@@ matchOnRemote
 
     Compare the remote evaluation to the given expression, and return
     true when they match. The expression can be a string or a regular
     expression. The evaluation is the same as for [trueOnRemote][].
 
-    ```
-      expect("return 123").to.matchOnRemote(123)<br/>
+    ```javascript
+    expect("return 123").to.matchOnRemote(123)<br/>
 
-      (function () { return typeof jQuery })
-        .should.not.matchOnRemote('undefined')
+    "typeof jQuery".should.not.matchOnRemote('undefined')
+    ```
+    
+    or an example in CoffeeScript
+
+    ```coffeescript
+    (-> typeof jQuery).should.not.matchOnRemote('undefined')
     ```
   ###
   _addMethod 'matchOnRemote', (matcher) ->
@@ -214,8 +214,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    matchTitle
-    ----------
+    @@@@ matchTitle
 
     True when the the title matches the given regular expression,
     or where a string is used match that string exactly.
@@ -234,8 +233,8 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    matchCurrentUrl
-    ---------------
+    @@@@ matchCurrentUrl
+
     the current URL matches the given string or regular expression
 
     ```javascript
@@ -251,8 +250,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    textInDOM
-    ---------
+    @@@@ textInDOM
 
     The given text can be found in the phantom browser's DOM.
 
@@ -271,8 +269,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    textMatch
-    ---------
+    @@@@ textMatch
 
     The text of the given selector matches the expression (a string
     or regular expression).
@@ -290,8 +287,7 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-    trueOnRemote
-    ------------
+    @@@@ trueOnRemote
 
     The given expression evaluates to true on the remote page. Expression may
     be a function, a function string, or a simple expression. Where a function
@@ -332,15 +328,13 @@ casperChai = (_chai, utils) ->
     )
 
   ###
-  visible
-  -------
+    @@@@ visible
 
-  The selector matches a visible element.
+    The selector matches a visible element.
 
-  ```javascript
-  expect("#hidden").to.not.be.visible
-  ```
-
+    ```javascript
+    expect("#hidden").to.not.be.visible
+    ```
   ###
   _addProperty 'visible', () ->
     selector = @_obj

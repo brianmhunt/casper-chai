@@ -12,10 +12,7 @@ License: MIT (see LICENSE.txt)
 
 Utilities
 ---------
-
-
-_exprAsFunction
----------------
+#### _exprAsFunction
 
 Given an expression, turn it in to something that can be
 evaluated remotely.
@@ -27,10 +24,7 @@ evaluated remotely.
 2. a function string e.g. "function () { return true }"
 
 3. an actual function e.g. function () { return 'hello' }
-
-
-_matches
---------
+#### _matches
 
 Returns true if a `against` matches `value`. The `against` variable
 can be a string or regular expression.
@@ -42,10 +36,8 @@ Chai Tests
 ----------
 
 The following are the tests that are added onto Chai Assertion.
+#### fieldValue
 
-
-fieldValue
-----------
 
 True when the named input provided has the given value.
 
@@ -56,10 +48,7 @@ Examples:
 ```javascript
 expect("name_of_input").to.have.fieldValue("123");
 ```
-
-
-inDOM
------
+#### inDOM
 
 True when the given selector is in the DOM
 
@@ -70,11 +59,7 @@ True when the given selector is in the DOM
 
 Note: We use "inDOM" instead of "exist" so we don't conflict with
 the chai.js BDD.
-
-
-
-loaded
-------
+#### loaded
 
 True when the given resource exists in the phantom browser.
 
@@ -82,25 +67,24 @@ True when the given resource exists in the phantom browser.
 expect("styles.css").to.not.be.loaded
 "jquery-1.8.3".should.be.loaded
 ```
-
-
-matchOnRemote
---------------
+#### matchOnRemote
 
 Compare the remote evaluation to the given expression, and return
 true when they match. The expression can be a string or a regular
 expression. The evaluation is the same as for [trueOnRemote][].
 
-```
+```javascript
 expect("return 123").to.matchOnRemote(123)<br/>
 
-(function () { return typeof jQuery })
-.should.not.matchOnRemote('undefined')
+"typeof jQuery".should.not.matchOnRemote('undefined')
 ```
 
+or an example in CoffeeScript
 
-matchTitle
-----------
+```coffeescript
+(-> typeof jQuery).should.not.matchOnRemote('undefined')
+```
+#### matchTitle
 
 True when the the title matches the given regular expression,
 or where a string is used match that string exactly.
@@ -108,29 +92,21 @@ or where a string is used match that string exactly.
 ```javascript
 expect("Google").to.matchTitle;
 ```
+#### matchCurrentUrl
 
-
-matchCurrentUrl
----------------
 the current URL matches the given string or regular expression
 
 ```javascript
 expect(/https:\/\//).to.matchCurrentUrl;
 ```
-
-
-textInDOM
----------
+#### textInDOM
 
 The given text can be found in the phantom browser's DOM.
 
 ```javascript
 "search".should.be.textInDOM</code></td>
 ```
-
-
-textMatch
----------
+#### textMatch
 
 The text of the given selector matches the expression (a string
 or regular expression).
@@ -138,10 +114,7 @@ or regular expression).
 ```javascript
 expect("#element").to.have.textMatch(/case InSenSitIvE/i);
 ```
-
-
-trueOnRemote
-------------
+#### trueOnRemote
 
 The given expression evaluates to true on the remote page. Expression may
 be a function, a function string, or a simple expression. Where a function
@@ -166,14 +139,10 @@ expect("return false").to.not.be.trueOnRemote;
 
 expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
 ```
-
-
-visible
--------
+#### visible
 
 The selector matches a visible element.
 
 ```javascript
 expect("#hidden").to.not.be.visible
 ```
-

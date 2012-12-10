@@ -47,6 +47,9 @@ task 'docs', 'create some Markdown docs in build/', ->
   # This strips out all the coffeescript comments from the source files and
   # putting them into the target.
   #
+  # The comments are at the moment expected to be in Github Flavoured Markdown:
+  # http://github.github.com/github-flavored-markdown/
+  #
   source_dir = require('path').join(__dirname, SRC_DIR)
   sources = []
 
@@ -76,6 +79,11 @@ task 'docs', 'create some Markdown docs in build/', ->
 
       # remove all leading space (so use ``` for code)
       .replace(/\n[ \t]+/gm, "\n")
+
+      # change \n\s*@@@+ to ### (for headers, since we can't use ###)
+      .replace(/\n\s*@@@@@/gm, "\n#####")
+      .replace(/\n\s*@@@@/gm, "\n####")
+      .replace(/\n\s*@@@/gm,  "\n###")
 
     return match_text
   ).join("\n\n") # join separate files together by newlines
