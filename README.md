@@ -30,8 +30,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </thead>
   <tbody>
     <tr>
-      <td>fieldValue(value)</td>
-      <td>
+      <td><h3>fieldValue(value)</h3>
         the named input provided has the given value
       </td>
       <td>
@@ -39,31 +38,31 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       </td>
     </tr>
     <tr>
-      <td>inDOM </td>
-      <td>when the given selector is in the DOM</td>
+      <td><h3>inDOM</h3>
+      when the given selector is in the DOM</td>
       <td><code>"#target".should.be.inDOM;</code></td>
     </tr>
     <tr>
-      <td>loaded</td>
-      <td>when the given resource exists</td>
+      <td><h3>loaded</h3>
+      when the given resource exists</td>
       <td>
       <code>expect("styles.css").to.not.be.loaded<br/>
         "jquery-1.8.3".should.be.loaded
       </code></td>
     </tr>
     <tr>
-      <td>visible</td>
-      <td>the selector matches a visible element</td>
+      <td><h3>visible</h3>
+      the selector matches a visible element</td>
       <td><code>expect("#hidden").to.not.be.visible</code></td>
     </tr>
     <tr>
-      <td>matchCurrentUrl</td>
-      <td>the current URL matches</td>
+      <td><h3>matchCurrentUrl</h3>
+      the current URL matches</td>
       <td><code>expect(/https:\/\//).to.matchCurrentUrl</code></td>
     </tr>
     <tr>
-      <td>matchOnRemote</td>
-      <td>compare the remote evaluation to the given expression, and return
+      <td><h3>matchOnRemote</h3>
+      compare the remote evaluation to the given expression, and return
       true when they match. The expression can be a string or a regular
       expression. The evaluation is the same as for <code>trueOnRemote</code>.
       </td>
@@ -75,18 +74,17 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       </td>
     </tr>
     <tr>
-      <td>matchTitle</td>
-      <td>the current Title matches</td>
+      <td><h3>matchTitle</h3>
+      the current Title matches</td>
       <td><code>expect("Google").to.matchTitle</code></td>
     </tr>
     <tr>
-      <td>textInDOM</td>
-      <td>the text can be found in the DOM</td>
+      <td><h3>textInDOM</h3>
+      the text can be found in the DOM</td>
       <td><code>"search".should.be.textInDOM</code></td>
     </tr>
     <tr>
-      <td>textMatch(expression)</td>
-      <td>
+      <td><h3>textMatch(expression)</h3>
         the text of the given selector matches the expression (a string
         or regular expression).
       </td>
@@ -95,8 +93,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       </td>
     </tr>
     <tr>
-    <td>trueOnRemote</td>
-    <td>
+    <td><h3>trueOnRemote</h3>
       The given expression evaluates to true on the remote page. Expression
       may be a function, a function string, or a simple expression. Where
       a function is passed in, the return value is tested. Where a 
