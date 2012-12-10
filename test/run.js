@@ -80,7 +80,6 @@ function require_node_module(name) {
  */
 _ = require_node_module("lodash");
 _.str = require_node_module('underscore.string');
-$ = require_node_module('jquery');
 require_node_module('icolor');
 
 
