@@ -5,14 +5,10 @@
 #  Targets:
 #
 #     test:
-#     	print some pretty colors on the console
+#     	Try out some Casper-Chai magic
 #
 #     toast:
-#       create the javascript files in the build/ directory
-#
-#
-# Based on sample cakefile at
-# https://github.com/kompiro/Cakefile-Sample/
+#       Turn lib/coffeescript into build/javascript
 #
 
 try
@@ -36,8 +32,16 @@ UGLIFY_CMD = './node_modules/uglify-js2/bin/uglifyjs2'
 task 'test', 'Print some pretty colors to the console', (options) ->
   cmd = 'casperjs'
   args = ["test/run.js"]
-  log "Cake is running: #{cmd} #{args.join(" ")}"
-  spawn cmd, args, customFds: [0, 1, 2]
+  cmdstr = "#{cmd} #{args.join(" ")}"
+  log "Cake is running: #{cmdstr}"
+
+  runner = spawn cmd, args, stdio: 'inherit'
+    
+  runner.on("exit", (code) ->
+    if code then rc = code else rc = 0
+    process.exit(rc)
+  )
+
 
 
 task 'deploy', 'Publish a patch release on npm (increments patch number)', ->
