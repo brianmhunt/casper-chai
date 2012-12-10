@@ -236,7 +236,7 @@ casperChai = (_chai, utils) ->
   ###
     @@@@ matchCurrentUrl
 
-    the current URL matches the given string or regular expression
+    True when the current URL matches the given string or regular expression
 
     ```javascript
       expect(/https:\/\//).to.matchCurrentUrl;
@@ -256,7 +256,7 @@ casperChai = (_chai, utils) ->
     The given text can be found in the phantom browser's DOM.
 
     ```javascript
-    "search".should.be.textInDOM</code></td>
+    "search".should.be.textInDOM
     ```
   ###
   _addProperty 'textInDOM', ->
@@ -309,7 +309,7 @@ casperChai = (_chai, utils) ->
     expect("return false").to.not.be.trueOnRemote;
 
     var foo = function () { return typeof jQuery == typeof void 0; )
-    foo.should.be.trueOnRemote;
+    foo.should.be.trueOnRemote; // unless Query is installed.
 
     expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
     ```

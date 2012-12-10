@@ -95,7 +95,7 @@ expect("Google").to.matchTitle;
 ```
 #### matchCurrentUrl
 
-the current URL matches the given string or regular expression
+True when the current URL matches the given string or regular expression
 
 ```javascript
 expect(/https:\/\//).to.matchCurrentUrl;
@@ -105,7 +105,7 @@ expect(/https:\/\//).to.matchCurrentUrl;
 The given text can be found in the phantom browser's DOM.
 
 ```javascript
-"search".should.be.textInDOM</code></td>
+"search".should.be.textInDOM
 ```
 #### textMatch
 
@@ -136,7 +136,7 @@ expect("function () { return true }").to.be.trueOnRemote;
 expect("return false").to.not.be.trueOnRemote;
 
 var foo = function () { return typeof jQuery == typeof void 0; )
-foo.should.be.trueOnRemote;
+foo.should.be.trueOnRemote; // unless Query is installed.
 
 expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
 ```
