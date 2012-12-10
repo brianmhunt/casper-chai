@@ -1,4 +1,4 @@
-/* casper-chai version 0.1.4 */
+/* casper-chai version 0.1.5 */
 
 // -- from: lib/casper-chai.coffee -- \\
 
@@ -33,8 +33,7 @@
       return _chai.Assertion.addMethod(name, method);
     };
     /*
-        _exprAsFunction
-        ---------------
+        @@@@ _exprAsFunction
     
         Given an expression, turn it in to something that can be
         evaluated remotely.
@@ -68,8 +67,7 @@
       return fn;
     };
     /*
-        _matches
-        --------
+        @@@@ _matches
     
         Returns true if a `against` matches `value`. The `against` variable
         can be a string or regular expression.
@@ -104,8 +102,8 @@
     */
 
     /*
-        fieldValue
-        ----------
+        @@@@ fieldValue
+        
     
         True when the named input provided has the given value.
     
@@ -135,8 +133,7 @@
       return this.assert(remoteValue === givenValue, ("expected field(s) " + selector + " to have value " + givenValue + ", ") + ("but it was " + remoteValue), ("expected field(s) " + selector + " to not have value " + givenValue + ", ") + "but it was");
     });
     /*
-        inDOM
-        -----
+        @@@@ inDOM
     
         True when the given selector is in the DOM
     
@@ -155,8 +152,7 @@
       return this.assert(casper.exists(selector), 'expected selector #{this} to be in the DOM, but it was not', 'expected selector #{this} to not be in the DOM, but it was');
     });
     /*
-        loaded
-        ------
+        @@@@ loaded
     
         True when the given resource exists in the phantom browser.
     
@@ -172,18 +168,23 @@
       return this.assert(casper.resourceExists(resourceTest), 'expected resource #{this} to exist, but it does not', 'expected resource #{this} to not exist, but it does');
     });
     /*
-        matchOnRemote
-        --------------
+        @@@@ matchOnRemote
     
         Compare the remote evaluation to the given expression, and return
         true when they match. The expression can be a string or a regular
-        expression. The evaluation is the same as for [trueOnRemote][].
+        expression. The evaluation is the same as for
+        [`trueOnRemote`](#trueonremote).
     
+        ```javascript
+        expect("return 123").to.matchOnRemote(123)<br/>
+    
+        "typeof jQuery".should.not.matchOnRemote('undefined')
         ```
-          expect("return 123").to.matchOnRemote(123)<br/>
+        
+        or an example in CoffeeScript
     
-          (function () { return typeof jQuery })
-            .should.not.matchOnRemote('undefined')
+        ```coffeescript
+        (-> typeof jQuery).should.not.matchOnRemote('undefined')
         ```
     */
 
@@ -195,8 +196,7 @@
       return this.assert(_matches(matcher, remoteValue, true), "expected " + this._obj + " (" + fn + " = " + remoteValue + ") to match " + matcher, "expected " + this._obj + " (" + fn + ") to not match " + matcher + ", but it did");
     });
     /*
-        matchTitle
-        ----------
+        @@@@ matchTitle
     
         True when the the title matches the given regular expression,
         or where a string is used match that string exactly.
@@ -213,9 +213,9 @@
       return this.assert(_matches(matcher, title), 'expected title #{this} to match #{exp}, but it did not', 'expected title #{this} to not match #{exp}, but it did');
     });
     /*
-        matchCurrentUrl
-        ---------------
-        the current URL matches the given string or regular expression
+        @@@@ matchCurrentUrl
+    
+        True when the current URL matches the given string or regular expression
     
         ```javascript
           expect(/https:\/\//).to.matchCurrentUrl;
@@ -229,13 +229,12 @@
       return this.assert(_matches(matcher, currentUrl), 'expected url #{exp} to match #{this}, but it did not', 'expected url #{exp} to not match #{this}, but it did');
     });
     /*
-        textInDOM
-        ---------
+        @@@@ textInDOM
     
         The given text can be found in the phantom browser's DOM.
     
         ```javascript
-        "search".should.be.textInDOM</code></td>
+        "search".should.be.textInDOM
         ```
     */
 
@@ -248,8 +247,7 @@
       return this.assert(haystack.indexOf(needle) !== -1, 'expected text #{this} to be in the document, but it was not', 'expected text #{this} to not be in the document, but it was found');
     });
     /*
-        textMatch
-        ---------
+        @@@@ textMatch
     
         The text of the given selector matches the expression (a string
         or regular expression).
@@ -266,8 +264,7 @@
       return this.assert(_matches(matcher, text), "expected '" + selector + "' to match " + matcher + ", but it did not", "expected '" + selector + "' to not match " + matcher + ", but it did");
     });
     /*
-        trueOnRemote
-        ------------
+        @@@@ trueOnRemote
     
         The given expression evaluates to true on the remote page. Expression may
         be a function, a function string, or a simple expression. Where a function
@@ -287,8 +284,8 @@
     
         expect("return false").to.not.be.trueOnRemote;
     
-        (function () { return typeof jQuery == typeof void 0
-        }).should.be.trueOnRemote;
+        var foo = function () { return typeof jQuery == typeof void 0; )
+        foo.should.be.trueOnRemote; // unless Query is installed.
     
         expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
         ```
@@ -302,14 +299,13 @@
       return this.assert(remoteValue, "expected expression " + this._obj + " to be true, but it was " + remoteValue, "expected expression " + this._obj + " to not be true, but itw as " + remoteValue);
     });
     /*
-      visible
-      -------
+        @@@@ visible
     
-      The selector matches a visible element.
+        The selector matches a visible element.
     
-      ```javascript
-      expect("#hidden").to.not.be.visible
-      ```
+        ```javascript
+        expect("#hidden").to.not.be.visible
+        ```
     */
 
     return _addProperty('visible', function() {

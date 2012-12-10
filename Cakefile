@@ -107,6 +107,9 @@ task 'deploy', 'Publish a patch release on npm (increments patch number)', ->
   console.log "version incrementing from #{version} => #{pkg.version}"
   fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2), "utf8")
 
+  # rebuild the docs
+  invoke 'docs'
+
   # build latest version
   invoke 'toast'
 
