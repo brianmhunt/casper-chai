@@ -71,7 +71,8 @@ expect("styles.css").to.not.be.loaded
 
 Compare the remote evaluation to the given expression, and return
 true when they match. The expression can be a string or a regular
-expression. The evaluation is the same as for [trueOnRemote][].
+expression. The evaluation is the same as for
+[`trueOnRemote`](#trueOnRemote).
 
 ```javascript
 expect("return 123").to.matchOnRemote(123)<br/>
