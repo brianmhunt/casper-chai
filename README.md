@@ -24,7 +24,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
 
 <table>
   <thead>
-    <th>Test</th>
+    <th>Name and description</th>
     <th>Examples (BDD, should & expect)</th>
   </thead>
   <tbody>
@@ -50,11 +50,6 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       </code></td>
     </tr>
     <tr>
-      <td><h3>visible</h3>
-      the selector matches a visible element</td>
-      <td><code>expect("#hidden").to.not.be.visible</code></td>
-    </tr>
-    <tr>
       <td><h3>matchCurrentUrl</h3>
       the current URL matches</td>
       <td><code>expect(/https:\/\//).to.matchCurrentUrl</code></td>
@@ -68,7 +63,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       <td>
         <code>
         expect("return 123").to.matchOnRemote(123)<br/>
-        (function () { return typeof jQuery}).should.not.matchOnRemote('undefined')
+        (function () { return typeof jQuery }).should.not.matchOnRemote('undefined')
         </code>
       </td>
     </tr>
@@ -105,10 +100,15 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
       expect("true").to.be.trueOnRemote<br/>
       expect("return false").to.not.be.trueOnRemote<br/>
       (function () { return typeof jQuery == typeof void 0
-      }).should.be.true<br/>
+      }).should.be.trueOnRemote<br/>
       expect("function () { return 1 == 0 }").to.not.be.trueOnRemote<br/>
     </code>
     </td>
+    </tr>
+    <tr>
+      <td><h3>visible</h3>
+      the selector matches a visible element</td>
+      <td><code>expect("#hidden").to.not.be.visible</code></td>
     </tr>
   </tbody>
 </table>
