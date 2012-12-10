@@ -12,6 +12,7 @@ var fs          = require('fs'),
   serverPort    = 8523, // the port where we create a server
   testServer    = "http://localhost:"+serverPort,
   any_failures  = false, // true when there has been a failure
+  jQueryCDN     = "http://code.jquery.com/jquery-1.8.3.min.js",
   should,
   casper;
 
@@ -115,11 +116,11 @@ casper = require('casper').create({
         loadImages: false,
         loadPlugins: false
     },
-    onLoadError: function (err) {
-      console.log("Unable to load resource: ".redbg.white + err);
+    onLoadError: function (_casper, url) {
+      console.log("[onLoadError]: ".redbg.white + url);
     },
     onTimeout: function (err) {
-      console.log(("Timeout: " + err).redbg.white);
+      console.log(("[Timeout]: " + err).redbg.white);
     },
     // logLevel: 'debug',
     // verbose: true,
@@ -259,6 +260,10 @@ casper.on('remote.message', function(msg) {
   console.log(">>> ".cyan + msg.bluebg.yellow);
 });
 
+casper.on('page.error', function(msg, trace) {
+  console.log(">>> Remote error: ".red, msg.red, trace);
+});
+
 // Set up casperChai.
 // TODO: option to use ../lib/casper-chai (i.e. unbuilt coffeescript)
 casperChai = require("../build/casper-chai");
@@ -285,31 +290,36 @@ _.each(fs.list("./"), function (specFile) {
  */ 
 require('webserver').create().listen(serverPort, function (request, response) {
   var fileToRead, content;
-  response.statusCode = 200;
 
   /* For what should be obvious reasons, don't leave this running. 
    */
   fileToRead = "./" + _.str.strRightBack(request.url, "/");
 
-  if (fileToRead.indexOf('..') !== -1) {
-    response.statusCode = 403; // forbidden
-    response.write("Forbidden: " + fileToRead);
-  }
-
   console.log("[testServer:".inverse + fileToRead.inverse + "]".inverse);
 
-  // FIXME 404 when not found
-  content = fs.read(fileToRead);
-  response.write(content);
+  if (fileToRead.indexOf('..') !== -1) {
+    response.writeHead(403, {}); // forbidden
+    response.write("Forbidden: " + fileToRead);
+    response.close();
+    console.log("Forbidden access to ".red + fileToRead);
+    return;
+  }
+
+  try {
+    content = fs.read(fileToRead);
+    response.writeHead(200, {});
+    response.write(content);
+  } catch (err) {
+    console.log("Error opening ".red + fileToRead.yellow);
+    response.writeHead(404, {});
+    response.write("");
+  }
 
   response.close();
 });
 
 console.log("Started test webserver on localhost:".yellow + 
     String(serverPort).yellow);
-
-
-
 
 /*
  * Start casper.

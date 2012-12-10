@@ -4,7 +4,7 @@
 ###
 # TODO: Test 'loaded'
 
-describe "the Casper-Chai addons to Chai", ->
+describe "Casper-Chai addons to Chai", ->
   before ->
     casper.open "simple.html" # local file
 
@@ -110,7 +110,56 @@ describe "the Casper-Chai addons to Chai", ->
         expect("#waldo").to.not.have.textMatch("Simon says, also")
         expect("#waldo").to.not.have.textMatch("Simon")
 
+  describe "the trueOnRemote method", ->
+    it "catches true function expressions", ->
+      casper.then ->
+        expect("function () { return true; }").to.be.trueOnRemote
+
+    it "catches true simple expressions", ->
+      casper.then ->
+        expect("return true").to.be.trueOnRemote
+
+    it "catches untrue simple expressions", ->
+      casper.then ->
+        expect("false").to.not.be.trueOnRemote
+
+    it "catches untrue function expressions", ->
+      casper.then ->
+        expect("function () { return false; }").to.not.be.trueOnRemote
+
+    it "catches true function", ->
+      casper.then ->
+        expect(-> true).to.be.trueOnRemote
+
+    it "catches false function", ->
+      casper.then ->
+        expect(-> 0).to.not.be.trueOnRemote
+
+    it "test for jQuery", ->
+      casper.then ->
+        expect(-> typeof jQuery == typeof undefined).to.be.trueOnRemote
+
+  describe "the matchOnRemote", ->
+    it "compares equal strings", ->
+      casper.then ->
+        expect("return \"hello\"").to.matchOnRemote("hello")
+
+    it "compares string to regular expression", ->
+      casper.then ->
+        expect("return \"hello\"").to.matchOnRemote(/HELLO/i)
+
+    it "compares simple expression to string", ->
+      casper.then ->
+        expect("\"hello\"").to.matchOnRemote("hello")
+
+    it "compares unequal strings", ->
+      casper.then ->
+        expect("\"hello\"").to.not.matchOnRemote("hZllo")
+        expect(-> "hello").to.not.matchOnRemote(/hZllo/)
+
   describe "trivial tests", ->
+    before -> casper.open "simple.html"
+
     it "to check for HttpStatus", ->
       casper.then ->
         expect(casper.currentHTTPStatus).to.equal(null) # we loaded from a file
@@ -120,9 +169,40 @@ describe "the Casper-Chai addons to Chai", ->
       casper.then ->
         expect(casper.currentHTTPStatus).to.equal(200) # we loaded over http
 
-    it "to check remote content", ->
+    it "to check remote content, created by a function remotely executed", ->
       casper.then ->
         remote_value = casper.evaluate(-> document.title + "eee")
 
         expect(remote_value).to.equal("The Titleeee")
+
+  describe "test for loaded", ->
+
+    it "checks for jQuery when it is not loaded", ->
+      casper.then ->
+        expect(-> typeof jQuery).to.matchOnRemote("undefined")
+
+        expect('jquery-1.8.3').to.not.be.loaded
+
+
+    it "checks for jQuery loaded by CDN", ->
+      casper.then ->
+        casper.waitStart()
+        casper.page.includeJs(jQueryCDN, ->
+          console.log("\t(Loaded #{jQueryCDN.green})")
+          casper.waitDone()
+        )
+
+        # includeJs is basically equivalent to:
+        # v = document.createElement("script");
+        # v.src = "http://code.jquery.com/jquery-1.8.3.min.js";
+        # document.body.appendChild(v);
+
+      casper.then ->
+        expect(-> typeof jQuery).to.not.matchOnRemote("undefined")
+        (-> typeof jQuery).should.not.matchOnRemote('undefined')
+        expect('jquery-1.8.3.min.js').to.be.loaded
+
+
+
+
 
