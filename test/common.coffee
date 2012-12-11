@@ -8,6 +8,67 @@ describe "Casper-Chai addons to Chai", ->
   before ->
     casper.open "simple.html" # local file
 
+  describe "the attr method", ->
+    it "matches 'class' by id", ->
+      casper.then ->
+        expect("#waldo").to.have.attr('class')
+
+    it "matches class by id", ->
+      casper.then ->
+        expect("#waldo").to.not.have.attr('classless')
+
+    it 'returns false where attribute is empty', ->
+      casper.then ->
+        expect("#waldo").to.not.have.attr("data-empty")
+
+    it 'fails when more than one attribute is returned', ->
+      casper.then ->
+        # two div classes have 'class'; explicitly fail - use attrAny or
+        # attrAll
+        failed = false
+        try
+          expect("div").to.not.have.attr('class')
+        catch err
+          failed = true
+
+        assert.ok(failed, "Expected failure, but `expect` succeeded.")
+
+  describe "the attrAny method", ->
+    it "finds one div with an 'id' attribute", ->
+      casper.then ->
+        expect('div').to.have.attrAny("id")
+
+    it "finds divs with an 'class' attribute", ->
+      casper.then ->
+        # all divs have the class attribute
+        expect('div').to.have.attrAny("class")
+
+    it "finds no divs with an 'data-empty' attribute", ->
+      casper.then ->
+        expect('div').to.not.have.attrAny("data-empty")
+
+  describe "the attrAll method", ->
+    it "finds not all divs have an 'id' attribute", ->
+      casper.then ->
+        expect('div').to.not.have.attrAll('id')
+
+    it "finds that all divs have a 'class' attribute", ->
+      casper.then ->
+        expect("div").to.have.attrAll('class')
+
+  describe "the tagName method", ->
+    it "finds that the '.says' tags are all 'divs'", ->
+      casper.then ->
+        expect(".says").to.have.tagName('div')
+
+    it "finds that the .tagged tags are divs and blockquotes", ->
+      casper.then ->
+        expect(".says").to.have.tagName(['div', 'blockquote'])
+
+    it "finds that the children of blockquotes are em and small tags", ->
+      casper.then ->
+        expect("blockquote *").to.have.tagName(['em', 'small'])
+
   describe "the inDOM property", ->
     it "matches a selector in the DOM", ->
       casper.then ->
@@ -204,7 +265,6 @@ describe "Casper-Chai addons to Chai", ->
         expect(remote_value).to.equal("The Titleeee")
 
   describe "test for loaded", ->
-
     it "checks for jQuery when it is not loaded", ->
       casper.then ->
         expect(-> typeof jQuery).to.matchOnRemote("undefined")

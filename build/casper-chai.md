@@ -14,6 +14,31 @@ Chai Tests
 ----------
 
 The following are the tests that are added onto Chai Assertion.
+#### attr(attribute_name)
+
+True when the attribute `attribute_name` on `selector` is true.
+
+If the selector matches more than one element with the attribute set, this
+will fail. In those cases [attrAll](#attrall) or [attrAny](#attrany).
+
+
+```javascript
+expect("#my_header").to.have.attr('class')
+```
+#### attrAny(attribute_name)
+
+True when an attribute is set on at least one of the given selectors.
+
+```javascript
+expect("div.menu li").to.have.attrAny('selected')
+```
+#### attrAll(attribute_name)
+
+True when an attribute is set on all of the given selectors.
+
+```javascript
+expect("div.menu li").to.have.attrAll('class')
+```
 #### fieldValue
 
 
@@ -53,7 +78,7 @@ expression. The evaluation is the same as for
 [`trueOnRemote`](#trueonremote).
 
 ```javascript
-expect("return 123").to.matchOnRemote(123)<br/>
+expect("return 123").to.matchOnRemote(123)
 
 "typeof jQuery".should.not.matchOnRemote('undefined')
 
@@ -79,6 +104,18 @@ True when the current URL matches the given string or regular expression
 
 ```javascript
 expect(/https:\/\//).to.matchCurrentUrl;
+```
+#### tagName
+
+All elements matching the given selector are one of the given tag names.
+
+In other words, given a selector, all tags must be one of the given tags.
+Note that those tags need not appear in the selector.
+
+```javascript
+".menuItem".has.tagName('li')
+
+"menu li *".has.tagName(['a', 'span'])
 ```
 #### textInDOM
 

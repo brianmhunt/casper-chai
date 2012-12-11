@@ -1,4 +1,4 @@
-/* casper-chai version 0.1.5 */
+/* casper-chai version 0.1.6 */
 
 // -- from: lib/casper-chai.coffee -- \\
 
@@ -17,36 +17,16 @@
   var casperChai;
 
   casperChai = function(_chai, utils) {
-    var assert, methods, properties, _addMethod, _addProperty, _exprAsFunction, _matches;
+    var assert, methods, properties, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
     properties = [];
     methods = [];
     assert = _chai.assert;
-    /*
-        Utilities
-        ---------
-    */
-
     _addProperty = function(name, func) {
       return _chai.Assertion.addProperty(name, func);
     };
     _addMethod = function(name, method) {
       return _chai.Assertion.addMethod(name, method);
     };
-    /*
-        @@@@ _exprAsFunction
-    
-        Given an expression, turn it in to something that can be
-        evaluated remotely.
-    
-        `expr` may be
-        
-        1. a bare string e.g. "false" or "return true";
-    
-        2. a function string e.g. "function () { return true }"
-    
-        3. an actual function e.g. function () { return 'hello' }
-    */
-
     _exprAsFunction = function(expr) {
       var fn;
       if (_.isFunction(expr)) {
@@ -66,15 +46,6 @@
       }
       return fn;
     };
-    /*
-        @@@@ _matches
-    
-        Returns true if a `against` matches `value`. The `against` variable
-        can be a string or regular expression.
-    
-        If `isEqualFallback` is true then we also try `_.isEqual`.
-    */
-
     _matches = function(against, value, isEqualFallback) {
       var regex;
       if (isEqualFallback == null) {
@@ -94,6 +65,23 @@
       }
       return regex.test(value);
     };
+    _get_attrs = function(selector, attr) {
+      var attrs, fn;
+      fn = function(selector, _attr) {
+        var _casper_attrs, _casper_chai_elements;
+        _casper_chai_elements = __utils__.findAll(selector);
+        _casper_attrs = [];
+        Array.prototype.forEach.call(_casper_chai_elements, function(e) {
+          return _casper_attrs.push(e.getAttribute(_attr));
+        });
+        return _casper_attrs;
+      };
+      attrs = casper.evaluate(fn, {
+        _selector: selector,
+        _attr: attr
+      });
+      return attrs;
+    };
     /*
         Chai Tests
         ----------
@@ -101,6 +89,60 @@
         The following are the tests that are added onto Chai Assertion.
     */
 
+    /*
+        @@@@ attr(attribute_name)
+    
+        True when the attribute `attribute_name` on `selector` is true.
+      
+        If the selector matches more than one element with the attribute set, this
+        will fail. In those cases [attrAll](#attrall) or [attrAny](#attrany).
+    
+    
+        ```javascript
+        expect("#my_header").to.have.attr('class')
+        ```
+    */
+
+    _addMethod('attr', function(attr) {
+      var attr_v, attrs, selector;
+      selector = this._obj;
+      attrs = _get_attrs(selector, attr);
+      assert.equal(attrs.length, 1, "Expected " + selector + " to have one match, but it had " + attrs.length);
+      attr_v = attrs[0];
+      return this.assert(attr_v, "Expected selector " + selector + " to have attribute " + attr + ", but it did not", ("Expected selector " + selector + " to not have attribute " + attr + ", ") + ("but it was " + attr_v));
+    });
+    /*
+        @@@@ attrAny(attribute_name)
+    
+        True when an attribute is set on at least one of the given selectors.
+    
+        ```javascript
+        expect("div.menu li").to.have.attrAny('selected')
+        ```
+    */
+
+    _addMethod('attrAny', function(attr) {
+      var attrs, selector;
+      selector = this._obj;
+      attrs = _get_attrs(selector, attr);
+      return this.assert(_.any(attrs), ("Expected one element matching selector " + selector + " to have attribute") + ("" + attr + " set, but none did"), ("Expected no elements matching selector " + selector + " to have attribute") + ("" + attr + " set, but at least one did"));
+    });
+    /*
+        @@@@ attrAll(attribute_name)
+    
+        True when an attribute is set on all of the given selectors.
+    
+        ```javascript
+        expect("div.menu li").to.have.attrAll('class')
+        ```
+    */
+
+    _addMethod('attrAll', function(attr) {
+      var attrs, selector;
+      selector = this._obj;
+      attrs = _get_attrs(selector, attr);
+      return this.assert(_.all(attrs), ("Expected all elements matching selector " + selector + " to have attribute") + ("" + attr + " set, but one did not have it"), ("Expected one elements matching selector " + selector + " to not have ") + (" attribute " + attr + " set, but they all had it"));
+    });
     /*
         @@@@ fieldValue
         
@@ -176,9 +218,11 @@
         [`trueOnRemote`](#trueonremote).
     
         ```javascript
-        expect("return 123").to.matchOnRemote(123)<br/>
+        expect("return 123").to.matchOnRemote(123)
     
         "typeof jQuery".should.not.matchOnRemote('undefined')
+    
+        "123.toString()".should.matchOnRemote(/\d+/)
         ```
         
         or an example in CoffeeScript
@@ -229,6 +273,49 @@
       return this.assert(_matches(matcher, currentUrl), 'expected url #{exp} to match #{this}, but it did not', 'expected url #{exp} to not match #{this}, but it did');
     });
     /*
+        @@@@ tagName
+    
+        All elements matching the given selector are one of the given tag names.
+    
+        In other words, given a selector, all tags must be one of the given tags.
+        Note that those tags need not appear in the selector.
+    
+        ```javascript
+        ".menuItem".has.tagName('li')
+    
+        "menu li *".has.tagName(['a', 'span'])
+        ```
+    */
+
+    _addMethod('tagName', function(ok_names) {
+      var diff, selector, tagnames, _get_tagnames;
+      selector = this._obj;
+      if (_.isString(ok_names)) {
+        ok_names = [ok_names];
+      } else if (!_.isArray(ok_names)) {
+        assert.ok(false, "tagName must be a string or list, it was " + typeof ok_names);
+      }
+      _get_tagnames = function(selector) {
+        var fn, _tagnames;
+        fn = function(selector, _attr) {
+          var _casper_chai_elements, _casper_tags;
+          _casper_chai_elements = __utils__.findAll(selector);
+          _casper_tags = [];
+          Array.prototype.forEach.call(_casper_chai_elements, function(e) {
+            return _casper_tags.push(e.tagName.toLowerCase());
+          });
+          return _casper_tags;
+        };
+        _tagnames = casper.evaluate(fn, {
+          _selector: selector
+        });
+        return _tagnames;
+      };
+      tagnames = _get_tagnames(selector);
+      diff = _.difference(tagnames, ok_names);
+      return this.assert(diff.length === 0, ("Expected " + selector + " to have only tags " + ok_names + ", but there was") + ("tag(s) " + diff + " appeared"), ("Expected " + selector + " to have tags other than " + ok_names + ", but ") + "those were the only tags that appeared");
+    });
+    /*
         @@@@ textInDOM
     
         The given text can be found in the phantom browser's DOM.
@@ -261,7 +348,7 @@
       var selector, text;
       selector = this._obj;
       text = casper.fetchText(selector);
-      return this.assert(_matches(matcher, text), "expected '" + selector + "' to match " + matcher + ", but it did not", "expected '" + selector + "' to not match " + matcher + ", but it did");
+      return this.assert(_matches(matcher, text), "expected '" + selector + "' to match " + matcher + ", but it was \"" + text + "\"", "expected '" + selector + "' to not match " + matcher + ", but it did");
     });
     /*
         @@@@ trueOnRemote

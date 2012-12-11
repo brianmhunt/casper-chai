@@ -29,6 +29,21 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </thead>
   <tbody>
     <tr>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#attr'>attr(attr_name)</a></td>
+      <td>True when one selector has the given attribute
+      </td>
+    </tr>
+    <tr>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#attrany'>attrAny(attr_name)</a></td>
+      <td>True when any selector has the given attribute
+      </td>
+    </tr>
+    <tr>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#attrall'>attrAll(attr_name)</a></td>
+      <td>True when all elements matching selector have the given attribute
+      </td>
+    </tr>
+    <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#fieldvalue'>fieldValue(value)</a></td>
       <td>
         the named input provided has the given value
@@ -53,6 +68,10 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#matchtitle'>matchTitle</a></td>
       <td>the current Title matches</td>
+    </tr>
+    <tr>
+      <td><a href='casper-chai/blob/master/build/casper-chai.md#tagname'>tagName(valid_tags)</a></td>
+      <td>all elements matching the selectors are one of the given tags</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#textindom'>textInDOM</a></td>
