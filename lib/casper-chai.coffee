@@ -139,7 +139,7 @@ casperChai = (_chai, utils) ->
     True when the attribute `attribute_name` on `selector` is true.
   
     If the selector matches more than one element with the attribute set, this
-    will fail. In those cases [attrAll](#attrall) or [attrAny](#attrany).
+    will fail. In those cases try [attrAll](#attrall) or [attrAny](#attrany).
 
 
     ```javascript
