@@ -25,72 +25,81 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
 <table>
   <thead>
     <th>Name</th>
-    <th>Description</th>
+    <th>Description - passes when ...</th>
+    <th>Example</th>
   </thead>
   <tbody>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#attr'>attr(attr_name)</a></td>
-      <td>True when one selector has the given attribute
-      </td>
+      <td>one selector has the given attribute</td>
+      <td>expect("#header_a").to.have.attr('target')</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#attrany'>attrAny(attr_name)</a></td>
-      <td>True when any selector has the given attribute
-      </td>
+      <td>any selector has the given attribute</td>
+      <td>expect(".menu div").to.have.attr('data-bind')</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#attrall'>attrAll(attr_name)</a></td>
-      <td>True when all elements matching selector have the given attribute
-      </td>
+      <td>all elements matching selector have the given attribute</td>
+      <td>expect('.menu div a').to.have.attr('href')</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#fieldvalue'>fieldValue(value)</a></td>
-      <td>
-        the named input provided has the given value
-      </td>
+      <td>the named input provided has the given value</td>
+      <td>"field_name".should.have.fieldValue("someValue")</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#indom'>inDOM</a></td>
       <td>when the given selector is in the DOM</td>
+      <td>expect('#header').to.be.inDOM</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#loaded'>loaded</a></td>
       <td>when the given resource exists</td>
+      <td>expect('styles.css').to.be.loaded</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#matchcurrenturl'>matchCurrentUrl</a></td>
       <td>the current URL matches</td>
+      <td>expect(/https:\/\//).to.matchCurrentUrl
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#matchonremote'>matchOnRemote</a></td>
       <td>compare the remote evaluation to the given expression</td>
+      <td>expect("typeof jQuery").to.matchOnRemote('undefined')</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#matchtitle'>matchTitle</a></td>
       <td>the current Title matches</td>
+      <td>expect(/Google/).to.matchTitle</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#tagname'>tagName(valid_tags)</a></td>
       <td>all elements matching the selectors are one of the given tags</td>
+      <td>expect('.menu *').to.have.tagName(['div', 'span'])</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#textindom'>textInDOM</a></td>
       <td>the text can be found in the DOM</td>
+      <td>expect('About google').to.be.textInDOM</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#textmatch'>textMatch(expression)</a></td>
       <td>
-        the text of the given selector matches the expression (a string
-        or regular expression).
+        the text of the given selector matches the expression (a string or regular expression).
       </td>
+      <td>expect('#my_header').to.have.textMatch("My Header")</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#trueonremote'>trueOnRemote</a></td>
       <td>the remote expression evaluates to something truthy</td>
+      <td>expect("true").to.be.trueOnRemote</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#visible'>visible</a></td>
       <td>the selector matches a visible element</td>
+      <td>expect('#my_header').to.be.visible</td>
     </tr>
   </tbody>
 </table>
