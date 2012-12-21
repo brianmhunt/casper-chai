@@ -12,9 +12,34 @@
 # TODO/FIXME: Pass the casper instance in (instead of using global casper)
 
 casperChai = (_chai, utils) ->
-  properties = []
-  methods = []
   assert = _chai.assert
+  Assertion = _chai.Assertion
+  flag = utils.flag
+
+  #
+  # Base class
+  # ----------
+  #
+  class CasperTest
+    constructor: () ->
+
+    test: () -> throw new Error("CasperTest::test must be overloaded.")
+    
+    addToChai: ->
+      thisTest = @
+      # _chai.Assertion.addMethod
+      if _.isFunction(@['chainMethod'])
+
+        # wrap the chain method
+        _chainMethod = (args...) ->
+          thisTest.chainMethod.apply(thisTest, @, args)
+
+        utils.addChainableMethod(Assertion.prototype,
+          _method, _chainMethod)
+      
+
+
+
 
   #
   #  Utilities
@@ -130,9 +155,51 @@ casperChai = (_chai, utils) ->
     The following are the tests that are added onto Chai Assertion.
   ###
   
-  
 
+  ###
+  @@@@ attr(attribute_name)
+
+  When chained, returns the value of the attribute,
+  otherwise it returns truthy when the attribute is set
+  to something other than an empty string.
+
+  ```javascript
+  expect(casper).selector("#header_1").to.have.attr("class")
+  expect(casper).selector("#header_1").to.have.attr("class").equal("title")
+  ```
+  ###
+  class Attr extends CasperTest
+    name: 'attr'
+
+    chainMethod: (chai_instance, attr_name) ->
+
+    method: (chai_instance, attr_name) ->
+      
+
+
+  ###
+  @@@@ selector(css3_selector)
+
+  When chained, returns a selector class with the string passed in, otherwise
+  it returns true when the selector is found at least once in the DOM.
   
+  expect(casper).selector("#existent_header").attr("class", "title")
+  ###
+  class Selector extends CasperTest
+    name: 'selector'
+
+    chainMethod: (chain_instance, selector) ->
+      flag(@, 'casper-selector', selector)
+
+
+
+
+      
+
+
+
+
+
   ###
     @@@@ attr(attribute_name)
 
