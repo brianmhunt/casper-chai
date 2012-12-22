@@ -20,7 +20,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   casperChai = function(_chai, utils) {
-    var AlwaysFlag, Assertion, AttrTest, CasperTest, OneFlag, RemoteSelector, SelectorTest, assert, flag, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
+    var AlwaysFlag, Assertion, AttrTest, CasperTest, OneFlag, RemoteSelector, SelectorTest, TagNameTest, assert, flag, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
     assert = _chai.assert;
     Assertion = _chai.Assertion;
     flag = utils.flag;
@@ -109,6 +109,19 @@
             return test.method.apply(test, args);
           };
           return utils.addChainableMethod(Assertion.prototype, test.name, _method, _chainMethod);
+        }
+      };
+
+      CasperTest.prototype.test_against_selector = function(attrs, test_cb, test_description) {
+        var sel;
+        sel = this.get_selector();
+        if (flag(this.chai, 'always')) {
+          this.chai.assert(_.all(attrs, test_cb), ("Expected all elements matching " + sel.definition + " to have ") + test_description + " but at least one did not");
+        } else {
+          this.chai.assert(_.any(attrs, test_cb), ("Expected an element matching " + sel.definition + " to have ") + test_description + " but none did");
+        }
+        if (flag(this.chai, 'one')) {
+          return this.chai.assert(_.filter(attrs, test_cb).length === 1, ("Expected only one element matching " + sel.definition + " to ") + test_description + " but more than one did");
         }
       };
 
@@ -217,17 +230,13 @@
       AttrTest.prototype.chainMethod = function() {};
 
       AttrTest.prototype.method = function(attr_name) {
-        var attrs, sel;
+        var attrs, sel, test_cb;
         sel = this.get_selector();
         attrs = sel.attrs(attr_name);
-        if (flag(this.chai, 'always')) {
-          this.chai.assert(_.all(attrs), ("Expected an element matching " + sel.definition + " to have ") + ("attribute " + attr_name));
-        } else {
-          this.chai.assert(_.any(attrs), ("Expected an element matching " + sel.definition + " to have ") + ("attribute " + attr_name));
-        }
-        if (flag(this.chai, 'one')) {
-          this.chai.assert(_.filter(attrs).length === 1, ("Expected only one element matching " + sel.definition + " to have ") + ("attribute " + attr_name + ", but more did"));
-        }
+        test_cb = function(attr) {
+          return attr;
+        };
+        this.test_against_selector(attrs, test_cb, "attribute \"" + attr_name + "\"");
         return flag(this.chai, 'object', attrs);
       };
 
@@ -235,6 +244,34 @@
 
     })(CasperTest);
     CasperTest.addToChai(AttrTest);
+    /*
+      @@@@ tagName
+    */
+
+    TagNameTest = (function(_super) {
+
+      __extends(TagNameTest, _super);
+
+      function TagNameTest() {
+        return TagNameTest.__super__.constructor.apply(this, arguments);
+      }
+
+      TagNameTest.prototype.name = 'tagName';
+
+      TagNameTest.prototype.chainMethod = function() {};
+
+      TagNameTest.prototype.method = function(ok_tags) {
+        if (_.isString(ok_tags)) {
+          return ok_tags = [ok_tags];
+        } else if (!_.isArray(ok_tags)) {
+          return assert.ok(false, "tagName must be a string or list, it was " + typeof ok_tags);
+        }
+      };
+
+      return TagNameTest;
+
+    })(CasperTest);
+    CasperTest.addToChai(TagNameTest);
     /*
       @@@@ one
     */

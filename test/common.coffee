@@ -14,18 +14,6 @@ describe "0.2 Casper-Chai addons to Chai", ->
         expect(@).selector("#waldo").to.have.attr('class')
         expect(@).selector("#waldo").to.not.have.attr.of('c2lass')
 
-  describe "the 'length' property of a selector", ->
-    it "should match one unique element", ->
-      casper.then ->
-        expect(@).selector("#waldo").length(1)
-        expect(@).selector("#waldo").to.not.have.length(42)
-        
-    
-    it "should match two elements", ->
-      casper.then ->
-        expect(@).selector("div").to.have.length(2)
-        expect(@).selector("div").to.not.have.length(4)
-
   describe "the 'one' chain modifier", ->
     it "should not throw an exception when only one element is matched", ->
       casper.then ->
@@ -63,9 +51,40 @@ describe "0.2 Casper-Chai addons to Chai", ->
       casper.then ->
         expect(@).selector("div").to.not.always.have.attr("id")
 
+  describe "the 'selector' length", ->
+    it "should count zero when no selectors match", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.have.length(0)
 
+    it.skip "should correctly match 'empty' when no element matches", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.be.empty
 
+    it.skip "should fail .exist when no element in the DOM matches", ->
+      # TODO: write our own 'exist' test
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.not.exist
 
+    it "should count one element", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.have.length(1)
+
+    it "should count two elements", ->
+      casper.then ->
+        expect(@).selector("div").to.have.length(2)
+
+    it "should negate correctly", ->
+      casper.then ->
+        expect(@).selector("div").to.not.have.length.above(2)
+
+  describe "the 'tagName' test", ->
+    it "should match a single tagname", ->
+      casper.then ->
+        expect(@).selector("form *").to.have.tagName('input')
+
+    it "should match multiple tagnames", ->
+      casper.then ->
+        expect(@).selector("blockquote *").to.have.tagName(['em', 'small'])
 
 
 

@@ -131,6 +131,33 @@ casperChai = (_chai, utils) ->
         utils.addChainableMethod(Assertion.prototype, test.name,
           _method, _chainMethod)
 
+    #
+    # test_against_selector
+    # ~~~~~~~~~~~~~~~~~~~~~
+    #
+    # Perform the given test against the elements matched by this test's
+    # selector (the 'object'), honouring the numerosity flags ('one', 'always')
+    #
+    test_against_selector: (attrs, test_cb, test_description) ->
+      sel = @get_selector() # for convenience
+      if flag(@chai, 'always')
+        @chai.assert(_.all(attrs, test_cb),
+          "Expected all elements matching #{sel.definition} to have " +
+          test_description + " but at least one did not"
+        )
+
+      else
+        @chai.assert(_.any(attrs, test_cb),
+          "Expected an element matching #{sel.definition} to have " +
+          test_description + " but none did"
+        )
+
+      if flag(@chai, 'one')
+        @chai.assert(_.filter(attrs, test_cb).length == 1,
+          "Expected only one element matching #{sel.definition} to " +
+          test_description + " but more than one did"
+        )
+
 
     #
     # get_selector
@@ -292,34 +319,42 @@ casperChai = (_chai, utils) ->
       # console.log("Chaining attr")
 
     method: (attr_name) ->
+      # for convenience: our selector
       sel = @get_selector()
+
+      # get the list of attributes e.g. for 'href'
+      # ['http://www.example.com', 'https://localhost']
       attrs = sel.attrs(attr_name)
 
-      #if not equalTo
-      #  cb = _.identity
-      #else
-      #  cb = (item) -> _.equals(item, equalTo)
+      # the callback that determines which attributes match
+      test_cb = (attr) -> attr
 
-      if flag(@chai, 'always')
-        @chai.assert(_.all(attrs),
-          "Expected an element matching #{sel.definition} to have " +
-          "attribute #{attr_name}"
-        )
-      else
-        @chai.assert(_.any(attrs),
-          "Expected an element matching #{sel.definition} to have " +
-          "attribute #{attr_name}"
-        )
-
-      if flag(@chai, 'one')
-        @chai.assert(_.filter(attrs).length == 1,
-          "Expected only one element matching #{sel.definition} to have " +
-          "attribute #{attr_name}, but more did"
-        )
+      @test_against_selector(attrs, test_cb, "attribute \"#{attr_name}\"")
 
       # set attrs list as the object for subsequent elements on the chain
       flag(@chai, 'object', attrs)
   CasperTest.addToChai(AttrTest)
+
+
+  ###
+  @@@@ tagName
+
+  ###
+  class TagNameTest extends CasperTest
+    name: 'tagName'
+
+    chainMethod: ->
+
+    method: (ok_tags) ->
+      if _.isString(ok_tags)
+        ok_tags = [ok_tags]
+      else if not _.isArray(ok_tags)
+        assert.ok(false, "tagName must be a string or list, it was " +
+            typeof ok_tags)
+
+  CasperTest.addToChai(TagNameTest)
+      
+
 
 
   ###
