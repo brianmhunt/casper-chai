@@ -20,10 +20,67 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   casperChai = function(_chai, utils) {
-    var Assertion, Attr, CasperTest, Selector, assert, flag, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
+    var AlwaysFlag, Assertion, AttrTest, CasperTest, OneFlag, RemoteSelector, SelectorTest, assert, flag, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
     assert = _chai.assert;
     Assertion = _chai.Assertion;
     flag = utils.flag;
+    RemoteSelector = (function() {
+
+      function RemoteSelector(casper, definition) {
+        var _this = this;
+        this.casper = casper;
+        this.definition = definition;
+        Object.defineProperty(this, 'length', {
+          get: function() {
+            var len_fn;
+            len_fn = function(_selector) {
+              return __utils__.findAll(_selector).length;
+            };
+            return _this.casper.evaluate(len_fn, {
+              _selector: _this.definition
+            });
+          }
+        });
+        this.isRemoteSelector = true;
+      }
+
+      RemoteSelector.prototype.map = function(fn, args) {
+        var mapped, _rfn;
+        _rfn = function(_selector, _fn, _args) {
+          var _casper_chai_elements, _casper_results;
+          _casper_chai_elements = __utils__.findAll(_selector);
+          _casper_results = [];
+          Array.prototype.forEach.call(_casper_chai_elements, function(element) {
+            return _casper_results.push(_fn.apply(element, _args));
+          });
+          return _casper_results;
+        };
+        mapped = this.casper.evaluate(_rfn, {
+          _selector: this.definition,
+          _fn: fn,
+          _args: args
+        });
+        return mapped;
+      };
+
+      RemoteSelector.prototype.attrs = function(attr) {
+        var attr_list, fn;
+        fn = function(_attr) {
+          return this.getAttribute(_attr);
+        };
+        attr_list = this.map(fn, [attr]);
+        return attr_list;
+      };
+
+      RemoteSelector.prototype.tagnames = function() {
+        return this.map(function() {
+          return this.tagName;
+        });
+      };
+
+      return RemoteSelector;
+
+    })();
     CasperTest = (function() {
 
       function CasperTest(chai, casper) {
@@ -31,9 +88,7 @@
         this.casper = casper;
       }
 
-      CasperTest.prototype.test = function() {
-        throw new Error("CasperTest::test must be overloaded.");
-      };
+      CasperTest.prototype.method = function() {};
 
       CasperTest.addToChai = function(TestClass) {
         var test, _chainMethod, _method;
@@ -57,54 +112,13 @@
         }
       };
 
-      CasperTest.prototype.selector_map = function(selector, fn, args) {
-        var mapped, _rfn;
-        _rfn = function(_selector, _fn, _args) {
-          var _casper_chai_elements, _casper_map;
-          _casper_chai_elements = __utils__.findAll(_selector);
-          _casper_map = [];
-          console.log("Args: " + _args);
-          Array.prototype.forEach.call(_casper_chai_elements, function(e) {
-            return _casper_attrs.push(_fn.apply(e, _args));
-          });
-          return _casper_map;
-        };
-        console.log("fn: " + fn + ", selector: " + selector + ", args: " + args);
-        mapped = this.casper.evaluate(_rfn, {
-          _selector: selector,
-          _fn: fn,
-          _args: args
-        });
-        return mapped;
-      };
-
-      CasperTest.prototype.chain_selector = function(selector) {
-        if (_.isUndefined(selector)) {
-          return flag(this.chai, 'casper-selector');
+      CasperTest.prototype.get_selector = function() {
+        var selector;
+        selector = flag(this.chai, 'object');
+        if (!selector.isRemoteSelector) {
+          selector = new RemoteSelector(this.casper, "html");
         }
-        return flag(this.chai, 'casper-selector', selector);
-      };
-
-      CasperTest.prototype.chain_attrs = function(attrs) {
-        if (_.isUndefined(attrs)) {
-          return flag(this.chai, 'casper-attrs');
-        }
-        return flag(this.chai, 'casper-attrs', attrs);
-      };
-
-      CasperTest.prototype.get_attrs = function(selector, attr) {
-        var fn;
-        fn = function(_attr) {
-          console.log("ATTR: " + _attr + ", this: " + this);
-          return this.getAttribute(_attr);
-        };
-        return this.selector_map(selector, fn, [attr]);
-      };
-
-      CasperTest.prototype.get_tagnames = function(selector) {
-        return this.selector_map(selector, function() {
-          return this[0].tagName;
-        });
+        return selector;
       };
 
       return CasperTest;
@@ -183,9 +197,6 @@
     /*
       @@@@ attr(attribute_name)
     
-      When chained, returns the value of the attribute,
-      otherwise it returns truthy when the attribute is set
-      to something other than an empty string.
     
       ```javascript
       expect(casper).selector("#header_1").to.have.attr("class")
@@ -193,29 +204,81 @@
       ```
     */
 
-    Attr = (function(_super) {
+    AttrTest = (function(_super) {
 
-      __extends(Attr, _super);
+      __extends(AttrTest, _super);
 
-      function Attr() {
-        return Attr.__super__.constructor.apply(this, arguments);
+      function AttrTest() {
+        return AttrTest.__super__.constructor.apply(this, arguments);
       }
 
-      Attr.prototype.name = 'attr';
+      AttrTest.prototype.name = 'attr';
 
-      Attr.prototype.chainMethod = function(attr_name) {};
+      AttrTest.prototype.chainMethod = function() {};
 
-      Attr.prototype.method = function(attr_name) {
-        var attrs;
-        attrs = this.get_attrs(this.chain_selector(), attr_name);
-        console.log("ABC := " + attr_name);
-        return "XYZ";
+      AttrTest.prototype.method = function(attr_name) {
+        var attrs, sel;
+        sel = this.get_selector();
+        attrs = sel.attrs(attr_name);
+        if (flag(this.chai, 'always')) {
+          this.chai.assert(_.all(attrs), ("Expected an element matching " + sel.definition + " to have ") + ("attribute " + attr_name));
+        } else {
+          this.chai.assert(_.any(attrs), ("Expected an element matching " + sel.definition + " to have ") + ("attribute " + attr_name));
+        }
+        if (flag(this.chai, 'one')) {
+          this.chai.assert(_.filter(attrs).length === 1, ("Expected only one element matching " + sel.definition + " to have ") + ("attribute " + attr_name + ", but more did"));
+        }
+        return flag(this.chai, 'object', attrs);
       };
 
-      return Attr;
+      return AttrTest;
 
     })(CasperTest);
-    CasperTest.addToChai(Attr);
+    CasperTest.addToChai(AttrTest);
+    /*
+      @@@@ one
+    */
+
+    OneFlag = (function(_super) {
+
+      __extends(OneFlag, _super);
+
+      function OneFlag() {
+        return OneFlag.__super__.constructor.apply(this, arguments);
+      }
+
+      OneFlag.prototype.name = 'one';
+
+      OneFlag.prototype.chainMethod = function() {
+        return flag(this.chai, 'one', true);
+      };
+
+      return OneFlag;
+
+    })(CasperTest);
+    CasperTest.addToChai(OneFlag);
+    /*
+      @@@@ always
+    */
+
+    AlwaysFlag = (function(_super) {
+
+      __extends(AlwaysFlag, _super);
+
+      function AlwaysFlag() {
+        return AlwaysFlag.__super__.constructor.apply(this, arguments);
+      }
+
+      AlwaysFlag.prototype.name = 'always';
+
+      AlwaysFlag.prototype.chainMethod = function() {
+        return flag(this.chai, 'always', true);
+      };
+
+      return AlwaysFlag;
+
+    })(CasperTest);
+    CasperTest.addToChai(AlwaysFlag);
     /*
       @@@@ selector(css3_selector)
     
@@ -225,30 +288,26 @@
       expect(casper).selector("#existent_header").attr("class", "title")
     */
 
-    Selector = (function(_super) {
+    SelectorTest = (function(_super) {
 
-      __extends(Selector, _super);
+      __extends(SelectorTest, _super);
 
-      function Selector() {
-        return Selector.__super__.constructor.apply(this, arguments);
+      function SelectorTest() {
+        return SelectorTest.__super__.constructor.apply(this, arguments);
       }
 
-      Selector.prototype.name = 'selector';
+      SelectorTest.prototype.name = 'selector';
 
-      Selector.prototype.chainMethod = function(selector) {
-        console.log("Chain... " + selector);
-        return this.chain_selector(selector);
+      SelectorTest.prototype.chainMethod = function(selector) {};
+
+      SelectorTest.prototype.method = function(selector) {
+        return flag(this.chai, 'object', new RemoteSelector(this.casper, selector));
       };
 
-      Selector.prototype.method = function(selector) {
-        console.log("Sslector " + selector);
-        return this.chain_selector(selector);
-      };
-
-      return Selector;
+      return SelectorTest;
 
     })(CasperTest);
-    CasperTest.addToChai(Selector);
+    CasperTest.addToChai(SelectorTest);
     /*
         @@@@ attr(attribute_name)
     

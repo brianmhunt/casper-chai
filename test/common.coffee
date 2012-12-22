@@ -2,23 +2,68 @@
 # Unit-tests for Casper-Chai
 #
 ###
-# TODO: Test 'loaded'
+
 
 describe "0.2 Casper-Chai addons to Chai", ->
   before ->
     casper.open "simple.html" # local file
 
-  describe "the 'attr' test",
+  describe "the 'attr' test", ->
     it "should test for attributes and negatives", ->
       casper.then ->
         expect(@).selector("#waldo").to.have.attr('class')
         expect(@).selector("#waldo").to.not.have.attr.of('c2lass')
 
-    it "should respect the 'one' modifier", ->
+  describe "the 'length' property of a selector", ->
+    it "should match one unique element", ->
       casper.then ->
+        expect(@).selector("#waldo").length(1)
+        expect(@).selector("#waldo").to.not.have.length(42)
+        
+    
+    it "should match two elements", ->
+      casper.then ->
+        expect(@).selector("div").to.have.length(2)
+        expect(@).selector("div").to.not.have.length(4)
 
-    it "should respect the 'always' modifier", ->
-      casper.then
+  describe "the 'one' chain modifier", ->
+    it "should not throw an exception when only one element is matched", ->
+      casper.then ->
+        expect(@).one.selector("#waldo").to.have.attr('class')
+
+    it "should throw when more than one element is matched", ->
+      casper.then ->
+        # ??? expect(@).one.selector("div").attr('class')
+        #       .to.throw(/one selector/)
+        throws = false
+
+        try
+          expect(@).one.selector("div").attr('class')
+        catch err
+          throws = true
+
+        assert(throws, "Expected a selector of more than one" +
+          " element to throw an exception, but it did not")
+
+      it "should pass when multiple selectors but only one with attr", ->
+        casper.then ->
+          expect(@).one.selector("div").to.have.attr("tagged")
+
+  describe "the 'always' chain modifier", ->
+    it "should pass when no elements are matched", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.always.have.attr("class")
+
+    it "should pass when all elements are matched", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.always.have.attr("class")
+        expect(@).selector("div").to.always.have.attr("class")
+
+    it "should fail when at least one element does not match", ->
+      casper.then ->
+        expect(@).selector("div").to.not.always.have.attr("id")
+
+
 
 
 

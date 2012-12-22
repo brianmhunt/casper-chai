@@ -175,7 +175,7 @@ function CasperReporter(runner) {
   });
 
   runner.on('test', function(test) {
-    console.log("\n" + indent(symbols.middot + " " + test.title));
+    console.log(indent(symbols.middot.yellow + " " + test.title));
   });
 
   runner.on('pending', function(test) {
@@ -183,7 +183,7 @@ function CasperReporter(runner) {
   });
 
   runner.on('pass', function(test){
-      console.log(indent(symbols.ok + " (" + test.title + ")").green);
+      // console.log(indent(symbols.ok + " (" + test.title + ")").green);
       stats.passes++;
   });
 

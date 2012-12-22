@@ -16,6 +16,78 @@ casperChai = (_chai, utils) ->
   Assertion = _chai.Assertion
   flag = utils.flag
 
+  class RemoteSelector
+    constructor: (@casper, @definition) ->
+
+      # Creates a property for the 'length' so that we can (lazily) calculate
+      # the number of elements that match this selector
+      Object.defineProperty(@, 'length',
+        get: =>
+          len_fn = (_selector) ->
+            return __utils__.findAll(_selector).length
+
+          return @casper.evaluate(len_fn,
+            _selector: @definition
+          )
+      )
+
+      # simple boolean for testing type
+      @isRemoteSelector = true
+
+    #
+    # map
+    # ~~~
+    #
+    # Return a map of all elements that match the selector through the
+    # given function. The 'this' of the function will be an element matched by
+    # selector; any args (an array) passed in will be passed along to the
+    # function (with .apply)
+    #
+    map: (fn, args) ->
+      # remote function
+      _rfn =  (_selector, _fn, _args) ->
+        _casper_chai_elements = __utils__.findAll(_selector)
+        _casper_results = []
+
+        #console.log "Remote fn #{_fn}, sel #{_selector}, args: #{_args}"
+
+        Array.prototype.forEach.call(_casper_chai_elements, (element) ->
+          _casper_results.push(_fn.apply(element, _args))
+        )
+
+        return _casper_results
+
+      # console.log "fn: #{fn}, definition: #{@definition}, args: #{args}"
+
+      mapped = @casper.evaluate(_rfn,
+        _selector: @definition,
+        _fn: fn,
+        _args: args,
+      )
+
+      return mapped
+
+    #
+    # get_attrs
+    # ~~~~~~~~~
+    #
+    # Get the given attribute on all elements matching the current selector.
+    # Returns a list of attributes with each item corresponding to an element
+    # in the DOM.
+    #
+    attrs: (attr) ->
+      fn = (_attr) -> @getAttribute(_attr)
+      attr_list = @map(fn, [attr])
+      return attr_list
+
+    #
+    # get_tagnames
+    # ~~~~~~~~~~~~
+    #
+    # Return a list of tagNames for each element matching the current selector
+    #
+    tagnames: -> @map(-> @tagName)
+
   #
   # Base class
   # ----------
@@ -23,8 +95,9 @@ casperChai = (_chai, utils) ->
   class CasperTest
     constructor: (@chai, @casper) ->
 
-    test: () -> throw new Error("CasperTest::test must be overloaded.")
-    
+    # this should be overloaded for a class that performs tests
+    method: ->
+
     #
     # addToChai
     # ~~~~~~~~~
@@ -58,88 +131,33 @@ casperChai = (_chai, utils) ->
         utils.addChainableMethod(Assertion.prototype, test.name,
           _method, _chainMethod)
 
+
     #
-    # selector_map
+    # get_selector
     # ~~~~~~~~~~~~
     #
-    # Return a map of all selectors through the given function. The 'this' of
-    # the function will be an element matched by selector; any args (an array)
-    # passed in will be passed along to the function (with .apply)
+    # Return the selector for this set of tests, or a selector for the "html"
+    # tag if one is not otherwise given.
     #
-    selector_map: (selector, fn, args) ->
-      # remote function
-      _rfn =  (_selector, _fn, _args) ->
-        _casper_chai_elements = __utils__.findAll(_selector)
-        _casper_map = []
+    # Tests should look like:
+    #   expect(casper).selector("#abc")...
+    # where 'selector' changes the 'object' to a Selector class.
+    get_selector: ->
+      selector = flag(@chai, 'object')
 
-        console.log "Args: #{_args}"
+      # if no selector is given, we should use top-level selector of "html"
+      if not selector.isRemoteSelector
+        selector = new RemoteSelector(@casper, "html")
 
-        Array.prototype.forEach.call(_casper_chai_elements, (e) ->
-          _casper_attrs.push(_fn.apply(e, _args))
-        )
+#      if flag(@chai, 'one')
+#        selector_count = selector.length
+#
+#        @chai.assert(selector_count == 1,
+#          "Expected one selector to match '#{selector.definition}', " +
+#          "but got #{selector_count}"
+#        )
 
-        return _casper_map
-
-      console.log "fn: #{fn}, selector: #{selector}, args: #{args}"
-
-      mapped = @casper.evaluate(_rfn,
-        _selector: selector,
-        _fn: fn,
-        _args: args,
-      )
-
-      return mapped
-
-    #
-    # chain_selector
-    # ~~~~~~~~~~~~~~
-    #
-    # Get the selector in the current chain if called without an argument,
-    # otherwise sets the selector to the given selector.
-    #
-    # TODO: Define functionality when no selector has been provided.
-    #
-    chain_selector: (selector) ->
-      if _.isUndefined(selector)
-        return flag(@chai, 'casper-selector')
-      return flag(@chai, 'casper-selector', selector)
-
-    #
-    # chain_attrs
-    # ~~~~~~~~~~~
-    #
-    # Get the attributes in the current chain if called without an argument,
-    # otherwise set them
-    #
-    chain_attrs: (attrs) ->
-      if _.isUndefined(attrs)
-        return flag(@chai, 'casper-attrs')
-      return flag(@chai, 'casper-attrs', attrs)
-
-
-    #
-    # get_attrs
-    # ~~~~~~~~~
-    #
-    # Get the given attributes on elements matching the current selector
-    #
-    get_attrs: (selector, attr) ->
-      fn = (_attr) ->
-        console.log "ATTR: #{_attr}, this: #{@}"
-        @getAttribute(_attr)
-
-      return @selector_map(selector, fn, [attr])
-
-    #
-    # get_tagnames
-    # ~~~~~~~~~~~~
-    #
-    # Return a list of tagNames matching the current selector
-    #
-    get_tagnames: (selector) ->
-      return @selector_map(selector, () -> @[0].tagName)
-
-
+      return selector
 
   #
   #  Utilities
@@ -261,34 +279,68 @@ casperChai = (_chai, utils) ->
   ###
   @@@@ attr(attribute_name)
 
-  When chained, returns the value of the attribute,
-  otherwise it returns truthy when the attribute is set
-  to something other than an empty string.
 
   ```javascript
   expect(casper).selector("#header_1").to.have.attr("class")
   expect(casper).selector("#header_1").to.have.attr("class").equal("title")
   ```
   ###
-  class Attr extends CasperTest
+  class AttrTest extends CasperTest
     name: 'attr'
 
-    chainMethod: (attr_name) ->
-      # What does this even do?
-      #selector = @chain_selector()
-      # console.log "chainMethod ATTR: #{attr_name}"
-      #attrs = @get_attrs(selector, attr_name)
-      #flag(@chai, 'chai-attrs', attrs)
+    chainMethod: () ->
+      # console.log("Chaining attr")
 
     method: (attr_name) ->
-      attrs = @get_attrs(@chain_selector(), attr_name)
-      console.log("ABC := #{attr_name}")
+      sel = @get_selector()
+      attrs = sel.attrs(attr_name)
 
-      @chai.assert(attrs
+      #if not equalTo
+      #  cb = _.identity
+      #else
+      #  cb = (item) -> _.equals(item, equalTo)
 
-  CasperTest.addToChai(Attr)
+      if flag(@chai, 'always')
+        @chai.assert(_.all(attrs),
+          "Expected an element matching #{sel.definition} to have " +
+          "attribute #{attr_name}"
+        )
+      else
+        @chai.assert(_.any(attrs),
+          "Expected an element matching #{sel.definition} to have " +
+          "attribute #{attr_name}"
+        )
+
+      if flag(@chai, 'one')
+        @chai.assert(_.filter(attrs).length == 1,
+          "Expected only one element matching #{sel.definition} to have " +
+          "attribute #{attr_name}, but more did"
+        )
+
+      # set attrs list as the object for subsequent elements on the chain
+      flag(@chai, 'object', attrs)
+  CasperTest.addToChai(AttrTest)
 
 
+  ###
+  @@@@ one
+
+
+  ###
+  class OneFlag extends CasperTest
+    name: 'one'
+    chainMethod: -> flag(@chai, 'one', true)
+  CasperTest.addToChai(OneFlag)
+
+
+  ###
+  @@@@ always
+
+  ###
+  class AlwaysFlag extends CasperTest
+    name: 'always'
+    chainMethod: -> flag(@chai, 'always', true)
+  CasperTest.addToChai(AlwaysFlag)
       
 
 
@@ -300,18 +352,17 @@ casperChai = (_chai, utils) ->
   
   expect(casper).selector("#existent_header").attr("class", "title")
   ###
-  class Selector extends CasperTest
+  class SelectorTest extends CasperTest
     name: 'selector'
 
     chainMethod: (selector) ->
-      console.log("Chain... #{selector}")
-      @chain_selector(selector)
+      # ...
 
     method: (selector) ->
-      console.log "Sslector #{selector}"
-      @chain_selector(selector)
+      # console.log "Setting object to RemoteSelector #{selector}"
+      flag(@chai, 'object', new RemoteSelector(@casper, selector))
 
-  CasperTest.addToChai(Selector)
+  CasperTest.addToChai(SelectorTest)
 
 
       
