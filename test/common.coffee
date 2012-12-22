@@ -4,9 +4,30 @@
 ###
 # TODO: Test 'loaded'
 
-describe "Casper-Chai addons to Chai", ->
+describe "0.2 Casper-Chai addons to Chai", ->
   before ->
     casper.open "simple.html" # local file
+
+  describe "the 'attr' test",
+    it "should test for attributes and negatives", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.have.attr('class')
+        expect(@).selector("#waldo").to.not.have.attr.of('c2lass')
+
+    it "should respect the 'one' modifier", ->
+      casper.then ->
+
+    it "should respect the 'always' modifier", ->
+      casper.then
+
+
+
+
+
+describe.skip "0.1 Casper-Chai addons to Chai", ->
+  before ->
+    casper.open "simple.html" # local file
+
 
   describe "the attr method", ->
     it "matches 'class' by id", ->

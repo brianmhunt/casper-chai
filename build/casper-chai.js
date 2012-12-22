@@ -1,4 +1,4 @@
-/* casper-chai version 0.1.6 */
+/* casper-chai version 0.2.0 */
 
 // -- from: lib/casper-chai.coffee -- \\
 
@@ -14,17 +14,108 @@
 
 
 (function() {
-  var casperChai;
+  var casperChai,
+    __slice = [].slice,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   casperChai = function(_chai, utils) {
-    var assert, methods, properties, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
-    properties = [];
-    methods = [];
+    var Assertion, Attr, CasperTest, Selector, assert, flag, _addMethod, _addProperty, _exprAsFunction, _get_attrs, _matches;
     assert = _chai.assert;
+    Assertion = _chai.Assertion;
+    flag = utils.flag;
+    CasperTest = (function() {
+
+      function CasperTest(chai, casper) {
+        this.chai = chai;
+        this.casper = casper;
+      }
+
+      CasperTest.prototype.test = function() {
+        throw new Error("CasperTest::test must be overloaded.");
+      };
+
+      CasperTest.addToChai = function(TestClass) {
+        var test, _chainMethod, _method;
+        test = new TestClass;
+        if (_.isFunction(test['chainMethod'])) {
+          _chainMethod = function() {
+            var args, casper;
+            args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+            casper = flag(this, 'object');
+            test = new TestClass(this, casper);
+            return test.chainMethod.apply(test, args);
+          };
+          _method = function() {
+            var args, casper;
+            args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+            casper = flag(this, 'object');
+            test = new TestClass(this, casper);
+            return test.method.apply(test, args);
+          };
+          return utils.addChainableMethod(Assertion.prototype, test.name, _method, _chainMethod);
+        }
+      };
+
+      CasperTest.prototype.selector_map = function(selector, fn, args) {
+        var mapped, _rfn;
+        _rfn = function(_selector, _fn, _args) {
+          var _casper_chai_elements, _casper_map;
+          _casper_chai_elements = __utils__.findAll(_selector);
+          _casper_map = [];
+          console.log("Args: " + _args);
+          Array.prototype.forEach.call(_casper_chai_elements, function(e) {
+            return _casper_attrs.push(_fn.apply(e, _args));
+          });
+          return _casper_map;
+        };
+        console.log("fn: " + fn + ", selector: " + selector + ", args: " + args);
+        mapped = this.casper.evaluate(_rfn, {
+          _selector: selector,
+          _fn: fn,
+          _args: args
+        });
+        return mapped;
+      };
+
+      CasperTest.prototype.chain_selector = function(selector) {
+        if (_.isUndefined(selector)) {
+          return flag(this.chai, 'casper-selector');
+        }
+        return flag(this.chai, 'casper-selector', selector);
+      };
+
+      CasperTest.prototype.chain_attrs = function(attrs) {
+        if (_.isUndefined(attrs)) {
+          return flag(this.chai, 'casper-attrs');
+        }
+        return flag(this.chai, 'casper-attrs', attrs);
+      };
+
+      CasperTest.prototype.get_attrs = function(selector, attr) {
+        var fn;
+        fn = function(_attr) {
+          console.log("ATTR: " + _attr + ", this: " + this);
+          return this.getAttribute(_attr);
+        };
+        return this.selector_map(selector, fn, [attr]);
+      };
+
+      CasperTest.prototype.get_tagnames = function(selector) {
+        return this.selector_map(selector, function() {
+          return this[0].tagName;
+        });
+      };
+
+      return CasperTest;
+
+    })();
     _addProperty = function(name, func) {
+      return;
       return _chai.Assertion.addProperty(name, func);
     };
     _addMethod = function(name, method) {
+      return;
       return _chai.Assertion.addMethod(name, method);
     };
     _exprAsFunction = function(expr) {
@@ -65,7 +156,7 @@
       }
       return regex.test(value);
     };
-    _get_attrs = function(selector, attr) {
+    _get_attrs = function(selector, attr, _casper) {
       var attrs, fn;
       fn = function(selector, _attr) {
         var _casper_attrs, _casper_chai_elements;
@@ -90,12 +181,81 @@
     */
 
     /*
+      @@@@ attr(attribute_name)
+    
+      When chained, returns the value of the attribute,
+      otherwise it returns truthy when the attribute is set
+      to something other than an empty string.
+    
+      ```javascript
+      expect(casper).selector("#header_1").to.have.attr("class")
+      expect(casper).selector("#header_1").to.have.attr("class").equal("title")
+      ```
+    */
+
+    Attr = (function(_super) {
+
+      __extends(Attr, _super);
+
+      function Attr() {
+        return Attr.__super__.constructor.apply(this, arguments);
+      }
+
+      Attr.prototype.name = 'attr';
+
+      Attr.prototype.chainMethod = function(attr_name) {};
+
+      Attr.prototype.method = function(attr_name) {
+        var attrs;
+        attrs = this.get_attrs(this.chain_selector(), attr_name);
+        console.log("ABC := " + attr_name);
+        return "XYZ";
+      };
+
+      return Attr;
+
+    })(CasperTest);
+    CasperTest.addToChai(Attr);
+    /*
+      @@@@ selector(css3_selector)
+    
+      When chained, returns a selector class with the string passed in, otherwise
+      it returns true when the selector is found at least once in the DOM.
+      
+      expect(casper).selector("#existent_header").attr("class", "title")
+    */
+
+    Selector = (function(_super) {
+
+      __extends(Selector, _super);
+
+      function Selector() {
+        return Selector.__super__.constructor.apply(this, arguments);
+      }
+
+      Selector.prototype.name = 'selector';
+
+      Selector.prototype.chainMethod = function(selector) {
+        console.log("Chain... " + selector);
+        return this.chain_selector(selector);
+      };
+
+      Selector.prototype.method = function(selector) {
+        console.log("Sslector " + selector);
+        return this.chain_selector(selector);
+      };
+
+      return Selector;
+
+    })(CasperTest);
+    CasperTest.addToChai(Selector);
+    /*
         @@@@ attr(attribute_name)
     
         True when the attribute `attribute_name` on `selector` is true.
       
         If the selector matches more than one element with the attribute set, this
-        will fail. In those cases [attrAll](#attrall) or [attrAny](#attrany).
+        will fail. In those cases try [attrAll](#attrall) or [attrAny](#attrany).
     
     
         ```javascript
