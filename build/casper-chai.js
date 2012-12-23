@@ -1,4 +1,102 @@
-/* casper-chai version 0.2.0 */
+/* casper-chai version 0.3.0 */
+
+// -- from: lib/casper-jquery.coffee -- \\
+
+/*
+# Casper-jQuery
+
+Add a function as `casper.$` for performing remote jQuery functions
+*/
+
+
+(function() {
+  var $, JQueryCasperWrapper, chai_jquery, jQueryInCasper, old_$, wrapped,
+    __slice = [].slice;
+
+  wrapped = ["attr", "css", "data", "class", "id", "is", "html", "text", "value", "visible", "hidden", "selected", "checked", "disabled", "empty", "exist", "match", "contain", "have"];
+
+  JQueryCasperWrapper = (function() {
+
+    function JQueryCasperWrapper(casper, selector) {
+      var _this = this;
+      this.casper = casper;
+      this.selector = selector;
+      _.each(wrapped, function(method) {
+        var wrapper;
+        wrapper = function() {
+          var args;
+          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+          return _this.jQueryThere(method, args);
+        };
+        return _this[method] = wrapper;
+      });
+      Object.defineProperty(this, 'length', {
+        get: function() {
+          var len_fn;
+          len_fn = function(_selector) {
+            return $(_selector).length;
+          };
+          return _this.casper.evaluate(len_fn, {
+            _selector: _this.selector
+          });
+        }
+      });
+    }
+
+    JQueryCasperWrapper.prototype.fn = {};
+
+    JQueryCasperWrapper.prototype.jQueryThere = function(methodName, args) {
+      var remote_fn;
+      remote_fn = function(_selector, _methodName, _args) {
+        var jobj;
+        jobj = jQuery(_selector);
+        return jobj[_methodName].apply(jobj, _args);
+      };
+      return casper.evaluate(remote_fn, {
+        _selector: this.selector,
+        _methodName: methodName,
+        _args: args
+      });
+    };
+
+    return JQueryCasperWrapper;
+
+  })();
+
+  /*
+    jQueryInCasper
+    --------------
+  
+    A wrapper for jQuery
+  */
+
+
+  jQueryInCasper = function(selector) {
+    return new JQueryCasperWrapper(this, selector);
+  };
+
+  jQueryInCasper.fn = {};
+
+  jQueryInCasper.each = function(items, cb) {
+    return _.each(items, function(item, index) {
+      return cb(index, item);
+    });
+  };
+
+  require('casper').Casper.prototype.$ = jQueryInCasper;
+
+  old_$ = $;
+
+  window.jQuery = casper.$;
+
+  chai_jquery = require('./node_modules/chai-jquery/chai-jquery');
+
+  chai.use(chai_jquery);
+
+  $ = old_$;
+
+}).call(this);
+
 
 // -- from: lib/casper-chai.coffee -- \\
 

@@ -23,7 +23,7 @@ catch err
 
 
 SRC_DIR = 'lib'
-COFFEE_SRC = ['casper-chai.coffee']
+COFFEE_SRC = ['casper-jquery.coffee', 'casper-chai.coffee']
 DEST = 'build/casper-chai'
 UGLIFY_CMD = './node_modules/uglify-js2/bin/uglifyjs2'
 DOC_TARGET = 'build/casper-chai.md'

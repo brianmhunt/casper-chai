@@ -4,89 +4,6 @@
 ###
 
 
-describe "0.2 Casper-Chai addons to Chai", ->
-  before ->
-    casper.open "simple.html" # local file
-
-  describe "the 'attr' test", ->
-    it "should test for attributes and negatives", ->
-      casper.then ->
-        expect(@).selector("#waldo").to.have.attr('class')
-        expect(@).selector("#waldo").to.not.have.attr.of('c2lass')
-
-  describe "the 'one' chain modifier", ->
-    it "should not throw an exception when only one element is matched", ->
-      casper.then ->
-        expect(@).one.selector("#waldo").to.have.attr('class')
-
-    it "should throw when more than one element is matched", ->
-      casper.then ->
-        # ??? expect(@).one.selector("div").attr('class')
-        #       .to.throw(/one selector/)
-        throws = false
-
-        try
-          expect(@).one.selector("div").attr('class')
-        catch err
-          throws = true
-
-        assert(throws, "Expected a selector of more than one" +
-          " element to throw an exception, but it did not")
-
-      it "should pass when multiple selectors but only one with attr", ->
-        casper.then ->
-          expect(@).one.selector("div").to.have.attr("tagged")
-
-  describe "the 'always' chain modifier", ->
-    it "should pass when no elements are matched", ->
-      casper.then ->
-        expect(@).selector("#no_such_agency").to.always.have.attr("class")
-
-    it "should pass when all elements are matched", ->
-      casper.then ->
-        expect(@).selector("#waldo").to.always.have.attr("class")
-        expect(@).selector("div").to.always.have.attr("class")
-
-    it "should fail when at least one element does not match", ->
-      casper.then ->
-        expect(@).selector("div").to.not.always.have.attr("id")
-
-  describe "the 'selector' length", ->
-    it "should count zero when no selectors match", ->
-      casper.then ->
-        expect(@).selector("#no_such_agency").to.have.length(0)
-
-    it.skip "should correctly match 'empty' when no element matches", ->
-      casper.then ->
-        expect(@).selector("#no_such_agency").to.be.empty
-
-    it.skip "should fail .exist when no element in the DOM matches", ->
-      # TODO: write our own 'exist' test
-      casper.then ->
-        expect(@).selector("#no_such_agency").to.not.exist
-
-    it "should count one element", ->
-      casper.then ->
-        expect(@).selector("#waldo").to.have.length(1)
-
-    it "should count two elements", ->
-      casper.then ->
-        expect(@).selector("div").to.have.length(2)
-
-    it "should negate correctly", ->
-      casper.then ->
-        expect(@).selector("div").to.not.have.length.above(2)
-
-  describe "the 'tagName' test", ->
-    it "should match a single tagname", ->
-      casper.then ->
-        expect(@).selector("form *").to.have.tagName('input')
-
-    it "should match multiple tagnames", ->
-      casper.then ->
-        expect(@).selector("blockquote *").to.have.tagName(['em', 'small'])
-
-
 
 describe.skip "0.1 Casper-Chai addons to Chai", ->
   before ->
@@ -375,7 +292,107 @@ describe.skip "0.1 Casper-Chai addons to Chai", ->
         (-> typeof jQuery).should.not.matchOnRemote('undefined')
         expect('jquery-1.8.3.min.js').to.be.loaded
 
+describe.skip "0.2 Casper-Chai addons to Chai", ->
+  before ->
+    casper.open "simple.html" # local file
 
+  describe "the 'attr' test", ->
+    it "should test for attributes and negatives", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.have.attr('class')
+        expect(@).selector("#waldo").to.not.have.attr.of('c2lass')
+
+  describe "the 'one' chain modifier", ->
+    it "should not throw an exception when only one element is matched", ->
+      casper.then ->
+        expect(@).one.selector("#waldo").to.have.attr('class')
+
+    it "should throw when more than one element is matched", ->
+      casper.then ->
+        # ??? expect(@).one.selector("div").attr('class')
+        #       .to.throw(/one selector/)
+        throws = false
+
+        try
+          expect(@).one.selector("div").attr('class')
+        catch err
+          throws = true
+
+        assert(throws, "Expected a selector of more than one" +
+          " element to throw an exception, but it did not")
+
+      it "should pass when multiple selectors but only one with attr", ->
+        casper.then ->
+          expect(@).one.selector("div").to.have.attr("tagged")
+
+  describe "the 'always' chain modifier", ->
+    it "should pass when no elements are matched", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.always.have.attr("class")
+
+    it "should pass when all elements are matched", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.always.have.attr("class")
+        expect(@).selector("div").to.always.have.attr("class")
+
+    it "should fail when at least one element does not match", ->
+      casper.then ->
+        expect(@).selector("div").to.not.always.have.attr("id")
+
+  describe "the 'selector' length", ->
+    it "should count zero when no selectors match", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.have.length(0)
+
+    it.skip "should correctly match 'empty' when no element matches", ->
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.be.empty
+
+    it.skip "should fail .exist when no element in the DOM matches", ->
+      # TODO: write our own 'exist' test
+      casper.then ->
+        expect(@).selector("#no_such_agency").to.not.exist
+
+    it "should count one element", ->
+      casper.then ->
+        expect(@).selector("#waldo").to.have.length(1)
+
+    it "should count two elements", ->
+      casper.then ->
+        expect(@).selector("div").to.have.length(2)
+
+    it "should negate correctly", ->
+      casper.then ->
+        expect(@).selector("div").to.not.have.length.above(2)
+
+  describe "the 'tagName' test", ->
+    it "should match a single tagname", ->
+      casper.then ->
+        expect(@).selector("form *").to.have.tagName('input')
+
+    it "should match multiple tagnames", ->
+      casper.then ->
+        expect(@).selector("blockquote *").to.have.tagName(['em', 'small'])
+
+
+describe "0.3 Casper-Chai addons to Chai", ->
+  before ->
+    casper.open "simple.html"
+
+  describe "the casper.$ addon", ->
+    it "should exist and be a function", ->
+      assert.isFunction(casper.$)
+
+    it "should have a length property that works as expected", ->
+      casper.then ->
+        casper.$("#waldo").should.have.length(1)
+        casper.$("div").should.have.length(2)
+        casper.$("#no_such_agency").should.have.length(0)
+
+    it "should detect visibility/hidden property", ->
+      casper.then ->
+        casper.$("#waldo").should.not.be.visible
+        casper.$("#afield").should.be.visible
 
 
 

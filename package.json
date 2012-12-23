@@ -7,7 +7,7 @@
     "casperjs",
     "phantomjs"
   ],
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Brian M Hunt <brianmhunt@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "chai": ">= 1.3.0",
-    "lodash": ">= 0.8"
+    "lodash": ">= 0.8",
+    "chai-jquery": "~1.1.0"
   },
   "devDependencies": {
     "icolor": "*",
