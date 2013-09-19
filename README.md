@@ -104,7 +104,7 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   </tbody>
 </table>
 
-More [documentation and examples](casper-chai/blob/master/build/casper-chai.md).
+More [documentation and examples](https://github.com/brianmhunt/casper-chai/blob/master/build/casper-chai.md).
 
 For even more examples, if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
