@@ -5,6 +5,11 @@ if (!phantom.casperLoaded) {
     phantom.exit(1);
 }
 
+if (phantom.version.major === 1 && phantom.version.minor < 9) {
+    console.log('CapserJS 1.1.0+ and PhantomJS 1.9 are required to run the tests');
+    phantom.exit(1);
+}
+
 var fs          = require('fs'),
   colorizer     = require('colorizer'),
   utils         = require('utils'),
@@ -12,7 +17,6 @@ var fs          = require('fs'),
   serverPort    = 8523, // the port where we create a server
   testServer    = "http://localhost:"+serverPort,
   any_failures  = false, // true when there has been a failure
-  jQueryCDN     = "http://code.jquery.com/jquery-1.8.3.min.js",
   should,
   casper;
 
@@ -25,7 +29,7 @@ if (fs.exists(cwd + "/package.json")) {
   // we are in casper-chai
   fs.changeWorkingDirectory("test");
 } else if (fs.exists(cwd + "/../package.json")) {
-  // we are in casper-chai/?/ (likely * = test)
+  // we are in casper-chai/*/ (likely * = test)
   fs.changeWorkingDirectory("../test");
 } else {
   // oh for __file__.
