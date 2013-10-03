@@ -5,6 +5,11 @@ if (!phantom.casperLoaded) {
     phantom.exit(1);
 }
 
+if (phantom.version.major === 1 && phantom.version.minor < 9) {
+    console.log('CapserJS 1.1.0+ and PhantomJS 1.9 are required to run the tests');
+    phantom.exit(1);
+}
+
 var fs          = require('fs'),
   colorizer     = require('colorizer'),
   utils         = require('utils'),
@@ -12,41 +17,9 @@ var fs          = require('fs'),
   serverPort    = 8523, // the port where we create a server
   testServer    = "http://localhost:"+serverPort,
   any_failures  = false, // true when there has been a failure
-  jQueryCDN     = "http://code.jquery.com/jquery-1.8.3.min.js",
   should,
   casper;
 
-/* Patch Function.prototype.bind
- *
- * Workaround for PhantomJS 1.7.0 bug
- * http://code.google.com/p/phantomjs/issues/detail?id=522
- *
- * The following function is from:
- * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
- */
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function (oThis) {
-    if (typeof this !== "function") {
-      // closest thing possible to the ECMAScript 5 internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    }
- 
-    var aArgs = Array.prototype.slice.call(arguments, 1), 
-        fToBind = this, 
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP && oThis
-              ? this
-              : oThis,
-              aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
- 
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
- 
-    return fBound;
-  };
-}
 
 /* Change to the /test directory
  *
@@ -64,24 +37,16 @@ if (fs.exists(cwd + "/package.json")) {
   casper.exit(1);
 }
 
-/*
- * Include modules that were installed with npm.
- */
-function require_node_module(name) {
-  var node_modules, pkg, pkg_main;
-  node_modules = "../node_modules/";
-
-  pkg = JSON.parse(fs.read(node_modules + name + "/package.json"));
-  pkg_main = node_modules + name + "/" + pkg.main;
-  return require("./" + pkg_main);
-}
+// since we changed to the /test directory, point casper's 
+// patched require to the root of the repository
+phantom.casperScriptBaseDir = '../';
 
 /*
  * Load dependencies
  */
-_ = require_node_module("lodash");
-_.str = require_node_module('underscore.string');
-require_node_module('icolor');
+_ = require("lodash");
+_.str = require('underscore.string');
+require('icolor');
 
 
 /*
@@ -90,7 +55,6 @@ require_node_module('icolor');
  *
  * The simple solution we use is to download a "pre-compiled" coffee-script.
  */
-phantom.injectJs("../contrib/coffee-script.js"); // creates CoffeeScript
 require('../contrib/mocha');
 chai = require("../contrib/chai");
 
@@ -269,19 +233,16 @@ casper.on('page.error', function(msg, trace) {
 casperChai = require("../build/casper-chai");
 chai.use(casperChai);
 
-/*
- * Load all the .coffee files
- */
-_.each(fs.list("./"), function (specFile) {
+fs.list("./").forEach(function (specFile) {
   // grep out files that do not end with .coffee
   if (!_.str.endsWith(specFile, ".coffee")) {
     return;
   }
-
+ 
   console.log("Loading", specFile.yellow);
   
   // the specFiles contain the tests i.e. describe(..., it ...)
-  CoffeeScript.run(fs.read(specFile));
+  require("test/" + specFile);
 });
 
 /*
