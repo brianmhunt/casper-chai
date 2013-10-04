@@ -44,10 +44,10 @@ casperChai = (_chai, utils) ->
   # 3. an actual function e.g. function () { return 'hello' }
   #
   _exprAsFunction = (expr) ->
-    if _.isFunction(expr)
+    if typeof expr is 'function'
       fn = expr
 
-    else if _.isString(expr)
+    else if typeof expr is 'string'
       if /^\s*function\s+/.test(expr)
         # expr is a string containing a function expression
         fn = expr
@@ -75,12 +75,12 @@ casperChai = (_chai, utils) ->
   #  Returns true if a `against` matches `value`. The `against` variable
   #  can be a string or regular expression.
   #
-  #  If `isEqualFallback` is true then we also try `_.isEqual`.
+  #  If `isEqualFallback` is true then we also try a deep equal.
   #
   _matches = (against, value, isEqualFallback=false) ->
     if typeof against == 'string'
       regex = new RegExp("^#{against}$")
-    else if _.isRegExp(against)
+    else if against instanceof RegExp
       regex = against
     else if isEqualFallback
       if toString.call(value) == "[object RuntimeArray]"
@@ -88,9 +88,9 @@ casperChai = (_chai, utils) ->
         # from casper.evaluate tend to be, and _.isEqual will say it is
         # not equal to an Array class even if the values are otherwise
         # identical.
-        value = _.toArray(value)
+        value = Array.prototype.slice.call value
 
-      return _.isEqual(against, value)
+      return against === value || JSON.stringify(against) === JSON.stringify(value)
     else
       throw new Error("Test received #{against}, but expected string"
         + " or regular expression.")
@@ -109,18 +109,11 @@ casperChai = (_chai, utils) ->
   _get_attrs = (selector, attr) ->
     fn = (selector, _attr) ->
       _casper_chai_elements = __utils__.findAll(selector)
-      _casper_attrs = []
-      Array.prototype.forEach.call(_casper_chai_elements, (e) ->
-        _casper_attrs.push(e.getAttribute(_attr))
-      )
-      return _casper_attrs
+      Array.prototype.map.call _casper_chai_elements, (e) -> e.getAttribute(_attr)
 
-    attrs = casper.evaluate(fn,
+    casper.evaluate fn,
       _selector: selector
       _attr: attr
-    )
-
-    return attrs
 
 
   ###
@@ -175,7 +168,7 @@ casperChai = (_chai, utils) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(_.any(attrs),
+    @assert(attrs.some (a) -> !!a,
       "Expected one element matching selector #{selector} to have attribute" +
         "#{attr} set, but none did",
       "Expected no elements matching selector #{selector} to have attribute" +
@@ -195,7 +188,7 @@ casperChai = (_chai, utils) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(_.all(attrs),
+    @assert(attrs.every (a) -> !!a,
       "Expected all elements matching selector #{selector} to have attribute" +
         "#{attr} set, but one did not have it",
       "Expected one elements matching selector #{selector} to not have " +
@@ -219,7 +212,7 @@ casperChai = (_chai, utils) ->
   _addMethod 'fieldValue', (givenValue) ->
     selector = @_obj
 
-    if _.isString(selector)
+    if typeof selector is 'string'
       # TODO switch to a generic selector [name=selector]
     else
       # FIXME when we use a generic selector, always do this check
@@ -364,27 +357,23 @@ casperChai = (_chai, utils) ->
   _addMethod 'tagName', (ok_names) ->
     selector = @_obj
 
-    if _.isString(ok_names)
+    if typeof ok_names is 'string'
       ok_names = [ok_names]
-    else if not _.isArray(ok_names)
+    else if not Array.isArray ok_names
       assert.ok(false, "tagName must be a string or list, it was " +
           typeof ok_names)
 
     _get_tagnames = (selector) ->
       fn = (selector, _attr) ->
         _casper_chai_elements = __utils__.findAll(selector)
-        _casper_tags = []
-        Array.prototype.forEach.call(_casper_chai_elements, (e) ->
-          _casper_tags.push(e.tagName.toLowerCase())
-        )
-        return _casper_tags
+        Array.prototype.map.call _casper_chai_elements, (e) -> e.tagName.toLowerCase()
 
-      _tagnames = casper.evaluate(fn, _selector: selector)
-      return _tagnames
+      casper.evaluate(fn, _selector: selector)
 
     tagnames = _get_tagnames(selector)
 
-    diff = _.difference(tagnames, ok_names)
+    diff = tagnames.filter (t) ->
+      ok_names.indexOf(t) >= 0
 
     @assert(diff.length == 0,
       "Expected #{selector} to have only tags #{ok_names}, but there was" +
