@@ -31,12 +31,12 @@ Casper's Tester you can use (in this case with [Mocha][] and Chai):
   <tbody>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#attr'>attr(attr_name)</a></td>
-      <td>one selector has the given attribute</td>
+      <td>exactly one element matching the selector has the given attribute</td>
       <td>expect("#header_a").to.have.attr('target')</td>
     </tr>
     <tr>
       <td><a href='casper-chai/blob/master/build/casper-chai.md#attrany'>attrAny(attr_name)</a></td>
-      <td>any selector has the given attribute</td>
+      <td>any element matching the selector has the given attribute</td>
       <td>expect(".menu div").to.have.attr('data-bind')</td>
     </tr>
     <tr>
@@ -128,15 +128,9 @@ project directory. You may have to run `npm install` to get dependencies
 (which, obviously, requires [npm][] to be installed), and make sure `cake` is
 available - which should be possible by running `npm install -g coffee-script`.
 
-### AMD
-
-Casper–Chai supports being used as an [AMD][] module, registering itself
-anonymously (just like Chai).
-
 [CasperJS]: http://casperjs.org/
 [Chai]: http://chaijs.com/
 [Mocha]: http://visionmedia.github.com/mocha/
-[AMD]: https://github.com/amdjs/amdjs-api/wiki/AMD
 [npm]: https://npmjs.org/
 [Tester]: http://casperjs.org/api.html#tester
 

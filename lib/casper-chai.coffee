@@ -5,13 +5,12 @@
   Copyright (C) 2012 Brian M Hunt
 
   Repository: http://github.com/brianmhunt/casper-chai.git
+
   License: MIT (see LICENSE.txt)
 
 ###
 
-# TODO/FIXME: Pass the casper instance in (instead of using global casper)
-
-casperChai = (_chai, utils) ->
+module.exports = (_chai) ->
   properties = []
   methods = []
   assert = _chai.assert
@@ -453,8 +452,6 @@ casperChai = (_chai, utils) ->
 
     remoteValue = casper.evaluate(fn)
 
-    # console.log("returns".magenta, remoteValue)
-
     @assert(remoteValue,
       "expected expression #{@_obj} to be true, but it was #{remoteValue}",
       "expected expression #{@_obj} to not be true, but itw as #{remoteValue}"
@@ -476,22 +473,3 @@ casperChai = (_chai, utils) ->
         'expected selector #{this} to be visible, but it was not',
         'expected selector #{this} to not be, but it was'
     )
-
-
-#
-# "Module systems magic dance"
-#
-if (typeof require == "function" and
-    typeof exports == "object" and
-    typeof module == "object")
-  # NodeJS
-  module.exports = casperChai
-else if (typeof define == "function" and define.amd)
-    # AMD
-  define(() -> return casperChai)
-else
-  # Other environment (usually <script> tag):
-  # plug in to global chai instance directly.
-  chai.use(casperChai)
-
-
