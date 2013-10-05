@@ -229,8 +229,7 @@ casper.on('page.error', function(msg, trace) {
 });
 
 // Set up casperChai.
-// TODO: option to use ../lib/casper-chai (i.e. unbuilt coffeescript)
-casperChai = require("../build/casper-chai");
+casperChai = require("../lib/casper-chai");
 chai.use(casperChai);
 
 fs.list("./").forEach(function (specFile) {
