@@ -218,18 +218,18 @@ describe "Casper-Chai addons to Chai", ->
         expect("\"hello\"").to.not.matchOnRemote("hZllo")
         expect(-> "hello").to.not.matchOnRemote(/hZllo/)
 
-    it "compares arrays with _.isEqual", ->
+    it "compares arrays with deep equal", ->
       casper.then ->
         expect("[1,2,3]").to.matchOnRemote([1,2,3])
 
         # TODO: raw object/array [1,2,3].should.matchOnRemote?
         (-> [42,16,17]).should.matchOnRemote([42,16,17])
 
-    it "compares unequal arrays", ->
+    it "compares unequal arrays with deep equal", ->
       casper.then ->
         (-> [42,16,17]).should.not.matchOnRemote([42,17,16])
 
-    it "compares integers (with _.isEqual)", ->
+    it "compares integers", ->
       casper.then ->
         expect(-> 42).to.matchOnRemote(42)
 
@@ -237,12 +237,12 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect(-> "aBcDe").to.matchOnRemote(/AbCdE/i)
 
-    it "compares floats (with _.isEqual)", ->
+    it "compares floats", ->
       casper.then ->
         # -0.29999999999999893 ~= -0.3
         expect(-> 13.3 - 13.6).to.matchOnRemote(13.3 - 13.6)
 
-    it "compares objects (with _.isEqual)", ->
+    it "compares objects with deep equal", ->
       casper.then ->
         expect(-> {a:1,b:2}).to.matchOnRemote({b:2,a:1})
 

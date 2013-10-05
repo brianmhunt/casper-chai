@@ -74,28 +74,16 @@ module.exports = (_chai) ->
   #  Returns true if a `against` matches `value`. The `against` variable
   #  can be a string or regular expression.
   #
-  #  If `isEqualFallback` is true then we also try a deep equal.
-  #
-  _matches = (against, value, isEqualFallback=false) ->
+  _matches = (against, value) ->
     if typeof against == 'string'
       regex = new RegExp("^#{against}$")
     else if against instanceof RegExp
       regex = against
-    else if isEqualFallback
-      if toString.call(value) == "[object RuntimeArray]"
-        # normalize the RuntimeArray type. This type is what arrays returned
-        # from casper.evaluate tend to be, and _.isEqual will say it is
-        # not equal to an Array class even if the values are otherwise
-        # identical.
-        value = Array.prototype.slice.call value
-
-      return against === value || JSON.stringify(against) === JSON.stringify(value)
     else
       throw new Error("Test received #{against}, but expected string"
         + " or regular expression.")
 
-    # console.log("RegExp", regex, "value", value)
-    return regex.test(value)
+    regex.test(value)
   
   #
   # _get_attrs
@@ -167,7 +155,7 @@ module.exports = (_chai) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(attrs.some (a) -> !!a,
+    @assert(attrs.some((a) -> a),
       "Expected one element matching selector #{selector} to have attribute" +
         "#{attr} set, but none did",
       "Expected no elements matching selector #{selector} to have attribute" +
@@ -187,7 +175,7 @@ module.exports = (_chai) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(attrs.every (a) -> !!a,
+    @assert(attrs.every((a) -> a),
       "Expected all elements matching selector #{selector} to have attribute" +
         "#{attr} set, but one did not have it",
       "Expected one elements matching selector #{selector} to not have " +
@@ -294,14 +282,24 @@ module.exports = (_chai) ->
   _addMethod 'matchOnRemote', (matcher) ->
     expr = @_obj
 
-    fn = _exprAsFunction(expr)
+    fn = _exprAsFunction expr
 
-    remoteValue = casper.evaluate(fn)
+    remoteValue = casper.evaluate fn
 
-    @assert(_matches(matcher, remoteValue, true),
-      "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
-      "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
-    )
+    if typeof matcher isnt 'string' and not (matcher instanceof RegExp)
+      if toString.call(remoteValue) is "[object RuntimeArray]"
+        # normalize the RuntimeArray type. This type is what arrays returned
+        # from casper.evaluate tend to be
+        remoteValue = Array.prototype.slice.call remoteValue
+
+      # use deepEqual
+      @_obj = remoteValue
+      @eql matcher, remoteValue
+    else
+      @assert(_matches(matcher, remoteValue),
+        "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
+        "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
+      )
 
   ###
     @@@@ matchTitle
@@ -362,22 +360,17 @@ module.exports = (_chai) ->
       assert.ok(false, "tagName must be a string or list, it was " +
           typeof ok_names)
 
-    _get_tagnames = (selector) ->
-      fn = (selector, _attr) ->
-        _casper_chai_elements = __utils__.findAll(selector)
-        Array.prototype.map.call _casper_chai_elements, (e) -> e.tagName.toLowerCase()
+    tagnames = casper.evaluate (selector) ->
+      elements = __utils__.findAll(selector)
+      Array.prototype.map.call elements, (e) -> e.tagName.toLowerCase()
+    , selector
 
-      casper.evaluate(fn, _selector: selector)
-
-    tagnames = _get_tagnames(selector)
-
-    diff = tagnames.filter (t) ->
-      ok_names.indexOf(t) >= 0
+    diff = tagnames.filter (t) -> ok_names.indexOf(t) < 0
 
     @assert(diff.length == 0,
-      "Expected #{selector} to have only tags #{ok_names}, but there was" +
-        "tag(s) #{diff} appeared",
-      "Expected #{selector} to have tags other than #{ok_names}, but " +
+      "Expected #{selector} to have only tags [#{ok_names}], but there was " +
+        "also tag(s) [#{diff}]",
+      "Expected #{selector} to have tags other than [#{ok_names}], but " +
         "those were the only tags that appeared",
     )
 
@@ -471,5 +464,5 @@ module.exports = (_chai) ->
     expect(selector).to.be.inDOM
     @assert(casper.visible(selector),
         'expected selector #{this} to be visible, but it was not',
-        'expected selector #{this} to not be, but it was'
+        'expected selector #{this} to not be visible, but it was'
     )
