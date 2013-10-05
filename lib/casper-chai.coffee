@@ -11,10 +11,6 @@
 ###
 
 module.exports = (_chai) ->
-  properties = []
-  methods = []
-  assert = _chai.assert
-
   #
   #  Utilities
   #  ---------
@@ -22,11 +18,9 @@ module.exports = (_chai) ->
 
   _addProperty = (name, func) ->
     _chai.Assertion.addProperty(name, func)
-    # assert[name] = Function.bind(assert, func)
 
   _addMethod = (name, method) ->
     _chai.Assertion.addMethod(name, method)
-    # assert[name] = Function.bind(assert, method)
 
   #
   #  _exprAsFunction
@@ -44,29 +38,25 @@ module.exports = (_chai) ->
   #
   _exprAsFunction = (expr) ->
     if typeof expr is 'function'
-      fn = expr
+      expr
 
     else if typeof expr is 'string'
       if /^\s*function\s+/.test(expr)
         # expr is a string containing a function expression
-        fn = expr
+        expr
 
       else
         # we have a bare string e.g. "true", or "jQuery == undefined"
         if expr.indexOf('return ') == -1
           # add a "return" function
-          fn = "function () { return #{expr} }"
+          "function () { return #{expr} }"
         else
           # the expression already contains a "return"; note that it may be
           # compound statement eg "console.log('yo'); return true"
-          fn = "function () { #{expr} }"
+          "function () { #{expr} }"
       
     else
-      @assert(false, "Expression #{expr} must be a function, or a string")
-
-    # console.log("expr: ", expr.yellow, "=>", fn.green)
-
-    return fn
+      throw new Error "Expression #{expr} must be a function, or a string"
 
   #
   # _matches
@@ -80,8 +70,7 @@ module.exports = (_chai) ->
     else if against instanceof RegExp
       regex = against
     else
-      throw new Error("Test received #{against}, but expected string"
-        + " or regular expression.")
+      throw new Error "Test received #{against}, but expected string or regular expression."
 
     regex.test(value)
   
@@ -94,13 +83,10 @@ module.exports = (_chai) ->
   #
   #
   _get_attrs = (selector, attr) ->
-    fn = (selector, _attr) ->
-      _casper_chai_elements = __utils__.findAll(selector)
-      Array.prototype.map.call _casper_chai_elements, (e) -> e.getAttribute(_attr)
-
-    casper.evaluate fn,
-      _selector: selector
-      _attr: attr
+    casper.evaluate (selector, attr) ->
+      elements = __utils__.findAll(selector)
+      Array.prototype.map.call elements, (e) -> e.getAttribute(attr),
+    , selector, attr
 
 
   ###
@@ -131,16 +117,15 @@ module.exports = (_chai) ->
 
     attrs = _get_attrs(selector, attr)
 
-    assert.equal(attrs.length, 1,
+    _chai.assert.equal(attrs.length, 1,
       "Expected #{selector} to have one match, but it had #{attrs.length}")
 
     attr_v = attrs[0]
 
-    @assert(attr_v,
+    @assert attr_v,
       "Expected selector #{selector} to have attribute #{attr}, but it did not",
       "Expected selector #{selector} to not have attribute #{attr}, " +
         "but it was #{attr_v}"
-    )
 
   ###
     @@@@ attrAny(attribute_name)
@@ -155,12 +140,11 @@ module.exports = (_chai) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(attrs.some((a) -> a),
+    @assert attrs.some((a) -> a),
       "Expected one element matching selector #{selector} to have attribute" +
         "#{attr} set, but none did",
       "Expected no elements matching selector #{selector} to have attribute" +
         "#{attr} set, but at least one did"
-    )
 
   ###
     @@@@ attrAll(attribute_name)
@@ -175,12 +159,11 @@ module.exports = (_chai) ->
     selector = @_obj
     attrs = _get_attrs(selector, attr)
 
-    @assert(attrs.every((a) -> a),
+    @assert attrs.every((a) -> a),
       "Expected all elements matching selector #{selector} to have attribute" +
         "#{attr} set, but one did not have it",
       "Expected one elements matching selector #{selector} to not have " +
         " attribute #{attr} set, but they all had it"
-    )
 
   ###
     @@@@ fieldValue
@@ -188,7 +171,7 @@ module.exports = (_chai) ->
 
     True when the named input provided has the given value.
 
-    Wraps Casper's `__utils__.getFieldValue(selector)`.
+    Wraps Casper's `__utils__.getFieldValue(inputName)`.
 
     Examples:
 
@@ -197,27 +180,23 @@ module.exports = (_chai) ->
     ```
   ###
   _addMethod 'fieldValue', (givenValue) ->
-    selector = @_obj
+    name = @_obj
 
-    if typeof selector is 'string'
+    if typeof name is 'string'
       # TODO switch to a generic selector [name=selector]
     else
       # FIXME when we use a generic selector, always do this check
-      expect(selector).to.be.inDOM
+      expect(name).to.be.inDOM
 
-    # FIXME should use something like getFieldValue from casperjs::clientutils
-    # but with all selectors
-    get_remote_value = (selector) ->
-      return __utils__.getFieldValue(selector)
+    remoteValue = casper.evaluate (n) ->
+      __utils__.getFieldValue(n)
+    , name
 
-    remoteValue = casper.evaluate(get_remote_value, selector: selector)
-
-    @assert(remoteValue == givenValue,
+    @assert remoteValue is givenValue,
       "expected field(s) #{selector} to have value #{givenValue}, " +
         "but it was #{remoteValue}",
       "expected field(s) #{selector} to not have value #{givenValue}, " +
         "but it was"
-    )
 
   ###
     @@@@ inDOM
@@ -235,10 +214,9 @@ module.exports = (_chai) ->
   ###
   _addProperty 'inDOM', () ->
     selector = @_obj
-    @assert(casper.exists(selector),
+    @assert casper.exists(selector),
         'expected selector #{this} to be in the DOM, but it was not',
         'expected selector #{this} to not be in the DOM, but it was'
-    )
 
   ###
     @@@@ loaded
@@ -252,10 +230,9 @@ module.exports = (_chai) ->
   ###
   _addProperty 'loaded', ->
     resourceTest = @_obj
-    @assert(casper.resourceExists(resourceTest),
+    @assert casper.resourceExists(resourceTest),
         'expected resource #{this} to exist, but it does not',
         'expected resource #{this} to not exist, but it does'
-    )
 
   ###
     @@@@ matchOnRemote
@@ -296,10 +273,9 @@ module.exports = (_chai) ->
       @_obj = remoteValue
       @eql matcher, remoteValue
     else
-      @assert(_matches(matcher, remoteValue),
+      @assert _matches(matcher, remoteValue),
         "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
         "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
-      )
 
   ###
     @@@@ matchTitle
@@ -315,10 +291,9 @@ module.exports = (_chai) ->
     matcher = @_obj
 
     title = casper.getTitle()
-    @assert(_matches(matcher, title),
-        'expected title #{this} to match #{exp}, but it did not',
-        'expected title #{this} to not match #{exp}, but it did',
-    )
+    @assert _matches(matcher, title),
+        'expected title #{this} to match #{title}, but it did not',
+        'expected title #{this} to not match #{title}, but it did',
 
   ###
     @@@@ matchCurrentUrl
@@ -332,10 +307,9 @@ module.exports = (_chai) ->
   _addProperty 'matchCurrentUrl', ->
     matcher = @_obj
     currentUrl = casper.getCurrentUrl()
-    @assert(_matches(matcher, currentUrl),
-      'expected url #{exp} to match #{this}, but it did not',
-      'expected url #{exp} to not match #{this}, but it did'
-    )
+    @assert _matches(matcher, currentUrl),
+      'expected url #{currentUrl} to match #{this}, but it did not',
+      'expected url #{currentUrl} to not match #{this}, but it did'
 
   ###
     @@@@ tagName
@@ -357,8 +331,7 @@ module.exports = (_chai) ->
     if typeof ok_names is 'string'
       ok_names = [ok_names]
     else if not Array.isArray ok_names
-      assert.ok(false, "tagName must be a string or list, it was " +
-          typeof ok_names)
+      throw new Error "tagName must be a string or list, it was " + typeof ok_names
 
     tagnames = casper.evaluate (selector) ->
       elements = __utils__.findAll(selector)
@@ -367,12 +340,11 @@ module.exports = (_chai) ->
 
     diff = tagnames.filter (t) -> ok_names.indexOf(t) < 0
 
-    @assert(diff.length == 0,
+    @assert diff.length == 0,
       "Expected #{selector} to have only tags [#{ok_names}], but there was " +
         "also tag(s) [#{diff}]",
       "Expected #{selector} to have tags other than [#{ok_names}], but " +
         "those were the only tags that appeared",
-    )
 
   ###
     @@@@ textInDOM
@@ -388,10 +360,9 @@ module.exports = (_chai) ->
     haystack = casper.evaluate ->
       document.body.textContent or document.body.innerText
 
-    @assert(haystack.indexOf(needle) != -1,
+    @assert haystack.indexOf(needle) != -1,
       'expected text #{this} to be in the document, but it was not'
       'expected text #{this} to not be in the document, but it was found'
-    )
 
   ###
     @@@@ textMatch
@@ -445,10 +416,9 @@ module.exports = (_chai) ->
 
     remoteValue = casper.evaluate(fn)
 
-    @assert(remoteValue,
+    @assert remoteValue,
       "expected expression #{@_obj} to be true, but it was #{remoteValue}",
       "expected expression #{@_obj} to not be true, but itw as #{remoteValue}"
-    )
 
   ###
     @@@@ visible
@@ -462,7 +432,6 @@ module.exports = (_chai) ->
   _addProperty 'visible', () ->
     selector = @_obj
     expect(selector).to.be.inDOM
-    @assert(casper.visible(selector),
+    @assert casper.visible(selector),
         'expected selector #{this} to be visible, but it was not',
         'expected selector #{this} to not be visible, but it was'
-    )
