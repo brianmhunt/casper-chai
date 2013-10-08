@@ -41,22 +41,13 @@ if (fs.exists(cwd + "/package.json")) {
 // patched require to the root of the repository
 phantom.casperScriptBaseDir = '../';
 
-/*
- * Load dependencies
- */
 _ = require("lodash");
 _.str = require('underscore.string');
 require('icolor');
 
-
-/*
- * While we could use an npm module for the following, it's a pain because
- * PhantomJS does not have some modules (eg 'path') that Node does.
- *
- * The simple solution we use is to download a "pre-compiled" coffee-script.
- */
-require('../contrib/mocha');
-chai = require("../contrib/chai");
+// 
+require('../node_modules/mocha/mocha');
+chai = require('../node_modules/chai/chai');
 
 /* chai-isms
  */

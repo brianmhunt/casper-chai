@@ -193,9 +193,9 @@ module.exports = (_chai) ->
     , name
 
     @assert remoteValue is givenValue,
-      "expected field(s) #{selector} to have value #{givenValue}, " +
+      "expected field(s) #{name} to have value #{givenValue}, " +
         "but it was #{remoteValue}",
-      "expected field(s) #{selector} to not have value #{givenValue}, " +
+      "expected field(s) #{name} to not have value #{givenValue}, " +
         "but it was"
 
   ###
