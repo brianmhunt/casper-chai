@@ -6,6 +6,7 @@ Chai assertions for CasperJS
 Copyright (C) 2012 Brian M Hunt
 
 Repository: http://github.com/brianmhunt/casper-chai.git
+
 License: MIT (see LICENSE.txt)
 
 
@@ -19,7 +20,7 @@ The following are the tests that are added onto Chai Assertion.
 True when the attribute `attribute_name` on `selector` is true.
 
 If the selector matches more than one element with the attribute set, this
-will fail. In those cases [attrAll](#attrall) or [attrAny](#attrany).
+will fail. In those cases try [attrAll](#attrall) or [attrAny](#attrany).
 
 
 ```javascript
@@ -44,7 +45,7 @@ expect("div.menu li").to.have.attrAll('class')
 
 True when the named input provided has the given value.
 
-Wraps Casper's `__utils__.getFieldValue(selector)`.
+Wraps Casper's `__utils__.getFieldValue(inputName)`.
 
 Examples:
 

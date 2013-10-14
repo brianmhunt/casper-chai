@@ -7,7 +7,7 @@
     "casperjs",
     "phantomjs"
   ],
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Brian M Hunt <brianmhunt@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -20,7 +20,7 @@
   "directories": {
     "lib": "./lib"
   },
-  "main": "./build/casper-chai.js",
+  "main": "./lib/casper-chai.coffee",
   "scripts": {
     "test": "cake test",
     "lint": "jshint ./lib"
