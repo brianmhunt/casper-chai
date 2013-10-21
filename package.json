@@ -7,7 +7,7 @@
     "casperjs",
     "phantomjs"
   ],
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Brian M Hunt <brianmhunt@gmail.com>",
   "license": "MIT",
   "repository": {
