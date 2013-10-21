@@ -210,8 +210,8 @@ module.exports = (_chai) ->
   _addProperty 'inDOM', () ->
     selector = @_obj
     @assert casper.exists(selector),
-        'expected selector #{this} to be in the DOM, but it was not',
-        'expected selector #{this} to not be in the DOM, but it was'
+        "expected selector #{selector} to be in the DOM, but it was not",
+        "expected selector #{selector} to not be in the DOM, but it was"
 
   ###
     @@@@ loaded
@@ -224,10 +224,9 @@ module.exports = (_chai) ->
     ```
   ###
   _addProperty 'loaded', ->
-    resourceTest = @_obj
-    @assert casper.resourceExists(resourceTest),
-        'expected resource #{this} to exist, but it does not',
-        'expected resource #{this} to not exist, but it does'
+    @assert casper.resourceExists(@_obj),
+        "expected resource #{@_obj} to exist, but it does not",
+        "expected resource #{@_obj} to not exist, but it does"
 
   ###
     @@@@ matchOnRemote
@@ -287,8 +286,8 @@ module.exports = (_chai) ->
 
     title = casper.getTitle()
     @assert _matches(matcher, title),
-        'expected title #{this} to match #{title}, but it did not',
-        'expected title #{this} to not match #{title}, but it did',
+        "expected title #{matcher} to match #{title}, but it did not",
+        "expected title #{matcher} to not match #{title}, but it did",
 
   ###
     @@@@ matchCurrentUrl
@@ -303,8 +302,8 @@ module.exports = (_chai) ->
     matcher = @_obj
     currentUrl = casper.getCurrentUrl()
     @assert _matches(matcher, currentUrl),
-      'expected url #{currentUrl} to match #{this}, but it did not',
-      'expected url #{currentUrl} to not match #{this}, but it did'
+      "expected url #{currentUrl} to match #{this}, but it did not",
+      "expected url #{currentUrl} to not match #{this}, but it did"
 
   ###
     @@@@ tagName
@@ -356,8 +355,8 @@ module.exports = (_chai) ->
       document.body.textContent or document.body.innerText
 
     @assert haystack.indexOf(needle) != -1,
-      'expected text #{this} to be in the document, but it was not'
-      'expected text #{this} to not be in the document, but it was found'
+      "expected text #{needle} to be in the document, but it was not"
+      "expected text #{needle} to not be in the document, but it was found"
 
   ###
     @@@@ textMatch
@@ -424,5 +423,5 @@ module.exports = (_chai) ->
   _addProperty 'visible', () ->
     selector = @_obj
     @assert casper.visible(selector),
-        'expected selector #{this} to be visible, but it was not',
-        'expected selector #{this} to not be visible, but it was'
+        "expected selector #{selector} to be visible, but it was not",
+        "expected selector #{selector} to not be visible, but it was"
