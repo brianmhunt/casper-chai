@@ -180,13 +180,8 @@ module.exports = (_chai) ->
     ```
   ###
   _addMethod 'fieldValue', (givenValue) ->
+    # TODO switch to a generic selector ([name=selector]) if name is not a selector
     name = @_obj
-
-    if typeof name is 'string'
-      # TODO switch to a generic selector [name=selector]
-    else
-      # FIXME when we use a generic selector, always do this check
-      expect(name).to.be.inDOM
 
     remoteValue = casper.evaluate (n) ->
       __utils__.getFieldValue(n)
@@ -377,10 +372,9 @@ module.exports = (_chai) ->
   _addMethod 'textMatch', (matcher) ->
     selector = @_obj
     text = casper.fetchText(selector)
-    @assert(_matches(matcher, text),
+    @assert _matches(matcher, text),
       "expected '#{selector}' to match #{matcher}, but it was \"#{text}\"",
       "expected '#{selector}' to not match #{matcher}, but it did"
-    )
 
   ###
     @@@@ trueOnRemote
@@ -410,9 +404,7 @@ module.exports = (_chai) ->
     ```
   ###
   _addProperty 'trueOnRemote', () ->
-    expr = @_obj
-
-    fn = _exprAsFunction(expr)
+    fn = _exprAsFunction(@_obj)
 
     remoteValue = casper.evaluate(fn)
 
@@ -431,7 +423,6 @@ module.exports = (_chai) ->
   ###
   _addProperty 'visible', () ->
     selector = @_obj
-    expect(selector).to.be.inDOM
     @assert casper.visible(selector),
         'expected selector #{this} to be visible, but it was not',
         'expected selector #{this} to not be visible, but it was'
