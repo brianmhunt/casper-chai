@@ -3,10 +3,41 @@
 #
 ###
 # TODO: Test 'loaded'
+expect = chai.expect
+chai.use require("../lib/casper-chai")
 
 describe "Casper-Chai addons to Chai", ->
   before ->
-    casper.open "simple.html" # local file
+    require("webserver").create().listen 8523, (request, response) ->
+      response.writeHead 200,
+        "Content-Type": "text/html"
+
+      response.write "<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Title</title>
+  </head>
+  <body>
+    <h1 id=\"header_1\">A Header</h1>
+
+    <blockquote class='tagged'>
+      “Do what you can, with what <em>you</em> have, where you are.”
+      <small>THEODORE ROOSEVELT.</small>
+    </blockquote>
+
+    <div id='waldo' class='says tagged' style='display: none'
+      data-empty=''>Simon says</div>
+
+    <div class='says'>Also says</div>
+
+    <form action=''>
+      <input id='afield' name='anamedfield' value='42' />
+    </form>
+  </body>
+</html>"
+      response.close()
+
+    casper.start "http://localhost:8523/"
 
   describe "the attr method", ->
     it "matches 'class' by id", ->
@@ -31,7 +62,7 @@ describe "Casper-Chai addons to Chai", ->
         catch err
           failed = true
 
-        assert.ok(failed, "Expected failure, but `expect` succeeded.")
+        failed.should.be.true
 
   describe "the attrAny method", ->
     it "finds one div with an 'id' attribute", ->
@@ -124,9 +155,9 @@ describe "Casper-Chai addons to Chai", ->
 
 
   describe "the matchCurrentUrl property", ->
-    it "matches /simple.html/", ->
+    it "matches /localhost/", ->
       casper.then ->
-        expect(/simple.html/).to.matchCurrentUrl
+        expect(/localhost/).to.matchCurrentUrl
 
     it "does not match /some_remote_host/", ->
       casper.then ->
@@ -247,13 +278,13 @@ describe "Casper-Chai addons to Chai", ->
         expect(-> {a:1,b:2}).to.matchOnRemote({b:2,a:1})
 
   describe "trivial tests", ->
-    before -> casper.open "simple.html"
+    before -> casper.start "http://localhost:10777/"
 
     it "to check for HttpStatus", ->
       casper.then ->
         expect(casper.currentHTTPStatus).to.equal(null) # we loaded from a file
 
-      casper.thenOpen testServer + "/simple.html" # "remote" file
+      casper.thenOpen "http://localhost:8523/" # "remote" file
 
       casper.then ->
         expect(casper.currentHTTPStatus).to.equal(200) # we loaded over http
