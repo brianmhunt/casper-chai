@@ -118,7 +118,7 @@ describe "Casper-Chai addons to Chai", ->
   describe "the isTextInDOM property", ->
     it "finds text somewhere in the DOM", ->
       casper.then ->
-        expect("THEODORE ROOSEVELT").to.be.textInDOM
+        expect("THEODORE ROOSEVELT").to.be.textInDOM.and.be.ok
 
     it "does not find text that is not in the DOM", ->
       casper.then ->
@@ -127,7 +127,7 @@ describe "Casper-Chai addons to Chai", ->
   describe "the matchTitle property", ->
     it "matches a regular expression (/Title/)", ->
       casper.then ->
-        expect(/Title/).to.matchTitle
+        expect(/Title/).to.matchTitle.and.be.ok
 
     it "does not match an given regular expression (/^Title/)", ->
       casper.then ->
@@ -143,18 +143,13 @@ describe "Casper-Chai addons to Chai", ->
 
   describe "BDD 'should' framework", ->
     it "should include the new asserts", ->
-      "#header_1".should.be.inDOM
-      "#header_X".should.not.be.inDOM
-
-  describe.skip "TDD 'assert' framework", ->
-    it "should have bound methods inDOM and others", ->
-      assert.inDOM("#header_1")
-
+      "#header_1".should.be.inDOM.and.visible.and.ok
+      "#header_X".should.not.be.inDOM.and.visible
 
   describe "the matchCurrentUrl property", ->
     it "matches /localhost/", ->
       casper.then ->
-        expect(/localhost/).to.matchCurrentUrl
+        expect(/localhost/).to.matchCurrentUrl.and.be.ok
 
     it "does not match /some_remote_host/", ->
       casper.then ->
@@ -202,7 +197,7 @@ describe "Casper-Chai addons to Chai", ->
   describe "the trueOnRemote method", ->
     it "catches true function expressions", ->
       casper.then ->
-        expect("function () { return true; }").to.be.trueOnRemote
+        expect("function () { return true; }").to.be.trueOnRemote.and.be.ok
 
     it "catches true simple expressions", ->
       casper.then ->
@@ -297,17 +292,15 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect(-> typeof jQuery).to.matchOnRemote("undefined")
 
-        expect('jquery-1.8.3').to.not.be.loaded
-
+        expect('jquery-1.8.3').to.not.be.loaded.now
 
     it "checks for jQuery loaded by CDN", ->
       casper.then ->
         jQueryCDN = 'http://code.jquery.com/jquery-1.8.3.min.js'
         casper.waitStart()
-        casper.page.includeJs(jQueryCDN, ->
-          console.log("\t(Loaded #{jQueryCDN.green})")
+        casper.page.includeJs jQueryCDN, ->
+          console.log("\t(Loaded #{jQueryCDN})")
           casper.waitDone()
-        )
 
         # includeJs is basically equivalent to:
         # v = document.createElement("script");
@@ -318,8 +311,3 @@ describe "Casper-Chai addons to Chai", ->
         expect(-> typeof jQuery).to.not.matchOnRemote("undefined")
         (-> typeof jQuery).should.not.matchOnRemote('undefined')
         expect('jquery-1.8.3.min.js').to.be.loaded
-
-
-
-
-
