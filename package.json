@@ -22,12 +22,12 @@
   },
   "main": "./lib/casper-chai.coffee",
   "scripts": {
-    "test": "./node_modules/mocha-casperjs/bin/mocha-casperjs",
+    "test": "./node_modules/mocha-casperjs/bin/mocha-casperjs --casper-chai-path=lib/casper-chai --expect",
     "lint": "jshint ./lib"
   },
   "devDependencies": {
     "chai": ">= 1.8.1",
-    "mocha-casperjs": "0.1.1",
+    "mocha-casperjs": "0.1.x",
     "mocha": ">= 1.13.0",
     "glob": "*",
     "semver": "*"

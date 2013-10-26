@@ -1,10 +1,7 @@
 ###
 # Unit-tests for Casper-Chai
-#
 ###
 # TODO: Test 'loaded'
-expect = chai.expect
-chai.use require("../lib/casper-chai")
 
 describe "Casper-Chai addons to Chai", ->
   before ->
