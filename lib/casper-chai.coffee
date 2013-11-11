@@ -314,9 +314,9 @@ module.exports = (_chai) ->
     Note that those tags need not appear in the selector.
 
     ```javascript
-    ".menuItem".has.tagName('li')
+    ".menuItem".should.have.tagName('li')
 
-    "menu li *".has.tagName(['a', 'span'])
+    "menu li *".should.have.tagName(['a', 'span'])
     ```
   ###
   _addMethod 'tagName', (ok_names) ->
