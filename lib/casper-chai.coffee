@@ -38,19 +38,11 @@ module.exports = (chai, utils) ->
   #
   # matches
   #
-  #  Returns true if a `against` matches `value`. The `against` variable
-  #  can be a string or regular expression.
+  #  If `against` is a regular expression, it returns true if `value` matches against. 
+  #  Otherwise returns true if `against` is equal to `value`
   #
   matches = (against, value) ->
-    if typeof against == 'string'
-      regex = new RegExp("^#{against}$")
-    else if against instanceof RegExp
-      regex = against
-    else
-      throw new Error "Test received #{against}, but expected string or regular expression."
-
-    regex.test(value)
- 
+    if against instanceof RegExp then against.test(value) else against is value
 
   ###
     Casper-Chai Assertions

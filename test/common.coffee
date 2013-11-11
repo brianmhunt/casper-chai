@@ -26,6 +26,7 @@ describe "Casper-Chai addons to Chai", ->
       data-empty=''>Simon says</div>
 
     <div class='says'>Also says</div>
+    <div class='math'>(1 + 1) = 2</div>
 
     <form action=''>
       <input id='afield' name='anamedfield' value='42' />
@@ -115,7 +116,7 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect("#waldo").to.not.be.visible
 
-  describe "the isTextInDOM property", ->
+  describe "the textInDOM property", ->
     it "finds text somewhere in the DOM", ->
       casper.then ->
         expect("THEODORE ROOSEVELT").to.be.textInDOM.and.be.ok
@@ -188,6 +189,7 @@ describe "Casper-Chai addons to Chai", ->
     it "matches a text string exactly", ->
       casper.then ->
         expect("#waldo").to.have.textMatch("Simon says")
+        expect(".math").to.have.textMatch("(1 + 1) = 2")
 
     it "does not match a partial string", ->
       casper.then ->
