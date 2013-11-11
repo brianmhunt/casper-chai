@@ -15,7 +15,6 @@ try
   {log} = require 'util'
   fs = require 'fs'
   glob = require 'glob'
-  _ = require 'lodash'
   coffee = require 'coffee-script'
 catch err
   console.log "\n Package loading issue; Perhaps `npm install` needs to be run."

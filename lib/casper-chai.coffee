@@ -1,29 +1,6 @@
-###
-  Chai assertions for CasperJS
-  ============================
-
-  Copyright (C) 2012 Brian M Hunt
-
-  Repository: http://github.com/brianmhunt/casper-chai.git
-
-  License: MIT (see LICENSE.txt)
-
-###
-
-module.exports = (_chai) ->
+module.exports = (chai, utils) ->
   #
-  #  Utilities
-  #  ---------
-  #
-
-  _addProperty = (name, func) ->
-    _chai.Assertion.addProperty(name, func)
-
-  _addMethod = (name, method) ->
-    _chai.Assertion.addMethod(name, method)
-
-  #
-  #  _exprAsFunction
+  #  exprAsFunction
   #
   #  Given an expression, turn it in to something that can be
   #  evaluated remotely.
@@ -36,7 +13,7 @@ module.exports = (_chai) ->
   #
   # 3. an actual function e.g. function () { return 'hello' }
   #
-  _exprAsFunction = (expr) ->
+  exprAsFunction = (expr) ->
     if typeof expr is 'function'
       expr
 
@@ -59,12 +36,12 @@ module.exports = (_chai) ->
       throw new Error "Expression #{expr} must be a function, or a string"
 
   #
-  # _matches
+  # matches
   #
   #  Returns true if a `against` matches `value`. The `against` variable
   #  can be a string or regular expression.
   #
-  _matches = (against, value) ->
+  matches = (against, value) ->
     if typeof against == 'string'
       regex = new RegExp("^#{against}$")
     else if against instanceof RegExp
@@ -73,31 +50,14 @@ module.exports = (_chai) ->
       throw new Error "Test received #{against}, but expected string or regular expression."
 
     regex.test(value)
-  
-  #
-  # _get_attrs
-  # ~~~~~~~~~~
-  #
-  # Return all values of `attr` on `selector` in the DOM.
-  #
-  #
-  #
-  _get_attrs = (selector, attr) ->
-    casper.evaluate (selector, attr) ->
-      elements = __utils__.findAll(selector)
-      Array.prototype.map.call elements, (e) -> e.getAttribute(attr),
-    , selector, attr
-
+ 
 
   ###
-    Chai Tests
+    Casper-Chai Assertions
     ----------
 
-    The following are the tests that are added onto Chai Assertion.
+    The following are the assertion tests that are added onto Chai Assertion.
   ###
-  
-  
-
   
   ###
     @@@@ attr(attribute_name)
@@ -112,12 +72,12 @@ module.exports = (_chai) ->
     expect("#my_header").to.have.attr('class')
     ```
   ###
-  _addMethod 'attr', (attr) ->
+  chai.Assertion.addMethod 'attr', (attr) ->
     selector = @_obj
 
-    attrs = _get_attrs(selector, attr)
+    attrs = casper.getElementsAttribute(selector, attr)
 
-    _chai.assert.equal(attrs.length, 1,
+    chai.assert.equal(attrs.length, 1,
       "Expected #{selector} to have one match, but it had #{attrs.length}")
 
     attr_v = attrs[0]
@@ -136,9 +96,9 @@ module.exports = (_chai) ->
     expect("div.menu li").to.have.attrAny('selected')
     ```
   ###
-  _addMethod 'attrAny', (attr) ->
+  chai.Assertion.addMethod 'attrAny', (attr) ->
     selector = @_obj
-    attrs = _get_attrs(selector, attr)
+    attrs = casper.getElementsAttribute(selector, attr)
 
     @assert attrs.some((a) -> a),
       "Expected one element matching selector #{selector} to have attribute" +
@@ -155,9 +115,9 @@ module.exports = (_chai) ->
     expect("div.menu li").to.have.attrAll('class')
     ```
   ###
-  _addMethod 'attrAll', (attr) ->
+  chai.Assertion.addMethod 'attrAll', (attr) ->
     selector = @_obj
-    attrs = _get_attrs(selector, attr)
+    attrs = casper.getElementsAttribute(selector, attr)
 
     @assert attrs.every((a) -> a),
       "Expected all elements matching selector #{selector} to have attribute" +
@@ -179,7 +139,7 @@ module.exports = (_chai) ->
     expect("name_of_input").to.have.fieldValue("123");
     ```
   ###
-  _addMethod 'fieldValue', (givenValue) ->
+  chai.Assertion.addMethod 'fieldValue', (givenValue) ->
     # TODO switch to a generic selector ([name=selector]) if name is not a selector
     name = @_obj
 
@@ -207,7 +167,7 @@ module.exports = (_chai) ->
   the chai.js BDD.
 
   ###
-  _addProperty 'inDOM', () ->
+  chai.Assertion.addProperty 'inDOM', () ->
     selector = @_obj
     @assert casper.exists(selector),
         "expected selector #{selector} to be in the DOM, but it was not",
@@ -223,7 +183,7 @@ module.exports = (_chai) ->
     "jquery-1.8.3".should.be.loaded
     ```
   ###
-  _addProperty 'loaded', ->
+  chai.Assertion.addProperty 'loaded', ->
     @assert casper.resourceExists(@_obj),
         "expected resource #{@_obj} to exist, but it does not",
         "expected resource #{@_obj} to not exist, but it does"
@@ -250,10 +210,10 @@ module.exports = (_chai) ->
     (-> typeof jQuery).should.not.matchOnRemote('undefined')
     ```
   ###
-  _addMethod 'matchOnRemote', (matcher) ->
+  chai.Assertion.addMethod 'matchOnRemote', (matcher) ->
     expr = @_obj
 
-    fn = _exprAsFunction expr
+    fn = exprAsFunction expr
 
     remoteValue = casper.evaluate fn
 
@@ -267,7 +227,7 @@ module.exports = (_chai) ->
       @_obj = remoteValue
       @eql matcher, remoteValue
     else
-      @assert _matches(matcher, remoteValue),
+      @assert matches(matcher, remoteValue),
         "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
         "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
 
@@ -281,11 +241,11 @@ module.exports = (_chai) ->
     expect("Google").to.matchTitle;
     ```
   ###
-  _addProperty 'matchTitle', ->
+  chai.Assertion.addProperty 'matchTitle', ->
     matcher = @_obj
 
     title = casper.getTitle()
-    @assert _matches(matcher, title),
+    @assert matches(matcher, title),
         "expected title #{matcher} to match #{title}, but it did not",
         "expected title #{matcher} to not match #{title}, but it did",
 
@@ -298,10 +258,10 @@ module.exports = (_chai) ->
       expect(/https:\/\//).to.matchCurrentUrl;
     ```
   ###
-  _addProperty 'matchCurrentUrl', ->
+  chai.Assertion.addProperty 'matchCurrentUrl', ->
     matcher = @_obj
     currentUrl = casper.getCurrentUrl()
-    @assert _matches(matcher, currentUrl),
+    @assert matches(matcher, currentUrl),
       "expected url #{currentUrl} to match #{this}, but it did not",
       "expected url #{currentUrl} to not match #{this}, but it did"
 
@@ -319,7 +279,7 @@ module.exports = (_chai) ->
     "menu li *".should.have.tagName(['a', 'span'])
     ```
   ###
-  _addMethod 'tagName', (ok_names) ->
+  chai.Assertion.addMethod 'tagName', (ok_names) ->
     selector = @_obj
 
     if typeof ok_names is 'string'
@@ -349,7 +309,7 @@ module.exports = (_chai) ->
     "search".should.be.textInDOM
     ```
   ###
-  _addProperty 'textInDOM', ->
+  chai.Assertion.addProperty 'textInDOM', ->
     needle = @_obj
     haystack = casper.evaluate ->
       document.body.textContent or document.body.innerText
@@ -368,10 +328,10 @@ module.exports = (_chai) ->
       expect("#element").to.have.textMatch(/case InSenSitIvE/i);
     ```
   ###
-  _addMethod 'textMatch', (matcher) ->
+  chai.Assertion.addMethod 'textMatch', (matcher) ->
     selector = @_obj
     text = casper.fetchText(selector)
-    @assert _matches(matcher, text),
+    @assert matches(matcher, text),
       "expected '#{selector}' to match #{matcher}, but it was \"#{text}\"",
       "expected '#{selector}' to not match #{matcher}, but it did"
 
@@ -402,8 +362,8 @@ module.exports = (_chai) ->
     expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
     ```
   ###
-  _addProperty 'trueOnRemote', () ->
-    fn = _exprAsFunction(@_obj)
+  chai.Assertion.addProperty 'trueOnRemote', () ->
+    fn = exprAsFunction(@_obj)
 
     remoteValue = casper.evaluate(fn)
 
@@ -420,7 +380,7 @@ module.exports = (_chai) ->
     expect("#hidden").to.not.be.visible
     ```
   ###
-  _addProperty 'visible', () ->
+  chai.Assertion.addProperty 'visible', () ->
     selector = @_obj
     @assert casper.visible(selector),
         "expected selector #{selector} to be visible, but it was not",
