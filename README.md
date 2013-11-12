@@ -85,11 +85,11 @@ Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
       <td>expect('About google').to.be.textInDOM</td>
     </tr>
     <tr>
-      <td><a href='docs/casper-chai.md#textmatch'>textMatch(expression)</a></td>
+      <td><a href='docs/casper-chai.md#text'>text(expression)</a></td>
       <td>
         the text of the given selector matches the expression (a string or regular expression).
       </td>
-      <td>expect('#my_header').to.have.textMatch("My Header")</td>
+      <td>expect('#my_header').to.have.text("My Header")</td>
     </tr>
     <tr>
       <td><a href='docs/casper-chai.md#trueonremote'>trueOnRemote</a></td>

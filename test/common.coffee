@@ -26,6 +26,7 @@ describe "Casper-Chai addons to Chai", ->
       data-empty=''>Simon says</div>
 
     <div class='says'>Also says</div>
+    
     <div class='math'>(1 + 1) = 2</div>
 
     <form action=''>
@@ -169,32 +170,44 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect("anamedfield").to.have.fieldValue("42")
 
-  describe "the textMatch method", ->
+  describe "the text method", ->
     it "matches #waldo's with a regular expression (/says/)", ->
       casper.then ->
-        expect("#waldo").to.have.textMatch(/says/)
+        expect("#waldo").to.have.text(/says/)
 
     it "matches a case insensitive regex expression (/says/i)", ->
       casper.then ->
-        expect("#waldo").to.have.textMatch(/SAYS/i)
+        expect("#waldo").to.have.text(/SAYS/i)
 
     it "matches multiple selectors with a regular expression", ->
       casper.then ->
-        expect("div.says").to.have.textMatch(/says/)
+        expect("div.says").to.have.text(/says/)
 
     it "does not match multiple selectors against a given selection", ->
       casper.then ->
-        expect("div.says").to.not.have.textMatch(/said/)
+        expect("div.says").to.not.have.text(/said/)
 
     it "matches a text string exactly", ->
       casper.then ->
-        expect("#waldo").to.have.textMatch("Simon says")
-        expect(".math").to.have.textMatch("(1 + 1) = 2")
+        expect("#waldo").to.have.text("Simon says")
+        expect(".math").to.have.text("(1 + 1) = 2")
 
     it "does not match a partial string", ->
       casper.then ->
-        expect("#waldo").to.not.have.textMatch("Simon says, also")
-        expect("#waldo").to.not.have.textMatch("Simon")
+        expect("#waldo").to.not.have.text("Simon says, also")
+        expect("#waldo").to.not.have.text("Simon")
+
+    it "does match a partial string with contains or include", ->
+      casper.then ->
+        expect("#waldo").to.contain.text("Simon")
+        expect("#waldo").to.include.text("Simon")
+        expect("div.says").to.contain.text("Also")
+
+    it "does not falsely match a partial string with contains or include", ->
+      casper.then ->
+        expect("#waldo").to.not.contain.text("Simon also says")
+        expect("#waldo").to.not.include.text("Simon is a monkey")
+        expect("div.says").to.not.contain.text("ALSO")
 
   describe "the trueOnRemote method", ->
     it "catches true function expressions", ->

@@ -311,21 +311,31 @@ module.exports = (chai, utils) ->
       "expected text #{needle} to not be in the document, but it was found"
 
   ###
-    @@@@ textMatch
+    @@@@ text
 
-    The text of the given selector matches the expression (a string
-    or regular expression).
+    The text of the given selector matches the expression if it is a regular expression,
+    or is equal to the text, if a string.
+
+    It supports the `contains` and `include` language chain to do partial matching
 
     ```javascript
-      expect("#element").to.have.textMatch(/case InSenSitIvE/i);
+      expect("#element").to.have.text(/case InSenSitIvE/i);
+      expect("#element").to.have.text("Welcome to My Site");
+      expect("#element").to.contain.text("Welcome");
     ```
   ###
-  chai.Assertion.addMethod 'textMatch', (matcher) ->
+  chai.Assertion.addMethod 'text', (matcher) ->
     selector = @_obj
     text = casper.fetchText(selector)
-    @assert matches(matcher, text),
-      "expected '#{selector}' to match #{matcher}, but it was \"#{text}\"",
-      "expected '#{selector}' to not match #{matcher}, but it did"
+    if utils.flag(this, 'contains') and typeof matcher is 'string'
+      @assert text?.indexOf(matcher) >= 0,
+        "expected '#{selector}' to contain #{matcher}, but it was \"#{text}\"",
+        "expected '#{selector}' to not contain #{matcher}, but it did"
+    else
+      verb = if matcher instanceof RegExp then 'contain' else 'be'
+      @assert matches(matcher, text),
+        "expected '#{selector}' to #{verb} #{matcher}, but it was \"#{text}\"",
+        "expected '#{selector}' to not #{verb} #{matcher}, but it did"
 
   ###
     @@@@ trueOnRemote
