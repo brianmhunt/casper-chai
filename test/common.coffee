@@ -153,7 +153,7 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect(casper.getCurrentUrl()+"X").to.not.matchCurrentUrl
 
-  describe "the hasFieldValue method", ->
+  describe "the fieldValue method", ->
     it "matches anamedfield's value of 42", ->
       casper.then ->
         expect("anamedfield").to.have.fieldValue("42")
@@ -197,80 +197,26 @@ describe "Casper-Chai addons to Chai", ->
         expect("#waldo").to.not.include.text("Simon is a monkey")
         expect("div.says").to.not.contain.text("ALSO")
 
-  describe "the trueOnRemote method", ->
-    it "catches true function expressions", ->
+  describe "evaluate language chain", ->
+    it "evaluates functions", ->
       casper.then ->
-        expect("function () { return true; }").to.be.trueOnRemote.and.be.ok
+        expect(->
+          fruits = strawberry: 'red', orange: 'orange', kiwi: 'green'
+          for fruit, color of fruits
+            "#{fruit}:#{color}"
+        ).to.evaluate.to.deep.equal ['strawberry:red', 'orange:orange', 'kiwi:green']
 
-    it "catches true simple expressions", ->
+    it "evaluates function strings", ->
       casper.then ->
-        expect("return true").to.be.trueOnRemote
+        expect("function () { return 'foo'; }").to.evaluate.to.equal 'foo'
 
-    it "catches untrue simple expressions", ->
+    it "evaluates expression strings that contain 'return'", ->
       casper.then ->
-        expect("false").to.not.be.trueOnRemote
+        expect("return true").to.evaluate.to.be.true.and.ok
 
-    it "catches untrue function expressions", ->
+    it "evaluates expression strings that does not contain 'return'", ->
       casper.then ->
-        expect("function () { return false; }").to.not.be.trueOnRemote
-
-    it "catches true function", ->
-      casper.then ->
-        expect(-> true).to.be.trueOnRemote
-
-    it "catches false function", ->
-      casper.then ->
-        expect(-> 0).to.not.be.trueOnRemote
-
-    it "test for jQuery", ->
-      casper.then ->
-        expect(-> typeof jQuery == typeof undefined).to.be.trueOnRemote
-
-  describe "the matchOnRemote", ->
-    it "correctly compares equal strings", ->
-      casper.then ->
-        expect("return \"hello\"").to.matchOnRemote("hello")
-
-    it "correctly compares string to regular expression", ->
-      casper.then ->
-        expect("return \"hello\"").to.matchOnRemote(/HELLO/i)
-
-    it "correctly compares simple expression to string", ->
-      casper.then ->
-        expect("\"hello\"").to.matchOnRemote("hello")
-
-    it "correctly compares unequal strings", ->
-      casper.then ->
-        expect("\"hello\"").to.not.matchOnRemote("hZllo")
-        expect(-> "hello").to.not.matchOnRemote(/hZllo/)
-
-    it "compares arrays with deep equal", ->
-      casper.then ->
-        expect("[1,2,3]").to.matchOnRemote([1,2,3])
-
-        # TODO: raw object/array [1,2,3].should.matchOnRemote?
-        (-> [42,16,17]).should.matchOnRemote([42,16,17])
-
-    it "compares unequal arrays with deep equal", ->
-      casper.then ->
-        (-> [42,16,17]).should.not.matchOnRemote([42,17,16])
-
-    it "compares integers", ->
-      casper.then ->
-        expect(-> 42).to.matchOnRemote(42)
-
-    it "compares returned value with a regular expression", ->
-      casper.then ->
-        expect(-> "aBcDe").to.matchOnRemote(/AbCdE/i)
-
-    it "compares floats", ->
-      casper.then ->
-        # -0.29999999999999893 ~= -0.3
-        expect(-> 13.3 - 13.6).to.matchOnRemote(13.3 - 13.6)
-
-    it "compares objects with deep equal", ->
-      casper.then ->
-        expect(-> {a:1,b:2}).to.matchOnRemote({b:2,a:1})
+        expect("typeof {}").to.evaluate.to.equal('object')
 
   describe "trivial tests", ->
     before -> casper.start "http://localhost:10777/"
@@ -293,7 +239,7 @@ describe "Casper-Chai addons to Chai", ->
   describe "test for loaded", ->
     it "checks for jQuery when it is not loaded", ->
       casper.then ->
-        expect(-> typeof jQuery).to.matchOnRemote("undefined")
+        expect(-> typeof jQuery).to.evaluate.to.equal("undefined")
 
         expect('jquery-1.8.3').to.not.be.loaded.now
 

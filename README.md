@@ -57,10 +57,10 @@ expect(/Casper/).to.matchTitle
 'Casper-Chai Example'.should.matchTitle
 'site.css'.should.be.loaded
 'body > header'.should.be.inDOM
-(function() { document.querySelectorAll('li').count === 3 }).to.be.trueOnRemote
+'document.querySelectorAll('li').count'.should.evaluate.to.be.above(2)
 '#help-link'.should.have.attribute('href')[0].and.equal("/help")
 'ul.breadcrumbs li'.should.contain.an.element.with.attr('aria-selected')
-'.greeting'.to.have.tagNames(['div', 'span'])
+'.greeting'.should.have.tagName(['div', 'span'])
 'li[aria-selected]'.should.contain.text('Using Chai')
 'header a'.should.have.text(/Sign/)
 '.greeting'.should.not.have.text(/Bye/)
@@ -76,7 +76,7 @@ Here are some assertions that fail
 'li[aria-selected]'.should.have.text('Using Chai')
 ````
 
-[Full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md), and if you are cool with
+See the [full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md), and if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
 tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee).
 

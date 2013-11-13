@@ -1,50 +1,12 @@
 module.exports = (chai, utils) ->
-  #
-  #  exprAsFunction
-  #
-  #  Given an expression, turn it in to something that can be
-  #  evaluated remotely.
-  #
-  # `expr` may be
-  #
-  # 1. a bare string e.g. "false" or "return true";
-  #
-  # 2. a function string e.g. "function () { return true }"
-  #
-  # 3. an actual function e.g. function () { return 'hello' }
-  #
-  exprAsFunction = (expr) ->
-    if typeof expr is 'function'
-      expr
 
-    else if typeof expr is 'string'
-      if /^\s*function\s+/.test(expr)
-        # expr is a string containing a function expression
-        expr
-
-      else
-        # we have a bare string e.g. "true", or "jQuery == undefined"
-        if expr.indexOf('return ') == -1
-          # add a "return" function
-          "function () { return #{expr} }"
-        else
-          # the expression already contains a "return"; note that it may be
-          # compound statement eg "console.log('yo'); return true"
-          "function () { #{expr} }"
-      
-    else
-      throw new Error "Expression #{expr} must be a function, or a string"
-
-  #
-  # matches
-  #
-  #  If `against` is a regular expression, it returns true if `value` matches against. 
-  #  Otherwise returns true if `against` is equal to `value`
-  #
   matches = (against, value) ->
     if against instanceof RegExp then against.test(value) else against is value
 
-
+  ###
+    Language Chains
+    ----------
+  ###
 
   ###
     @@@@ element
@@ -63,10 +25,49 @@ module.exports = (chai, utils) ->
     utils.flag this, 'element', true
 
   ###
+    @@@@ evaluate
+
+    Change the assertion subject to the result of the expression evaluated 
+    in the page. An expression may be a function, a function string, or a simple expression.
+    When a string is passed in it is wrapped in 'function () {}', with a 'return' statement
+    added if one is not already included, and this wrapped function is
+    evaluated as an ordinary function would be. When it is a function it is simply
+    evaluated in the page as is.
+
+    ```javascript
+    "true".should.evaluate.to.true;
+
+    (function() { return false }).should.evaluate.to.false;
+
+    expect("function () { return true }").to.evaluate.to.true;
+
+    "document.querySelectorAll('body').length".should.evaluate.to.be.at.least(1);
+
+    var foo = function () { return typeof jQuery ; )
+    expect(foo).to.evaluate.to.be.undefined; // unless jQuery is installed.
+
+    "0 === -0".should.evaluate.to.be.false.wat
+    ```
+  ###
+  chai.Assertion.addProperty 'evaluate', ->
+    expr = utils.flag this, 'object'
+    if typeof expr is 'string' and not /^\s*function\s+/.test(expr)
+      # we have a bare string e.g. "true", or "jQuery == undefined"
+      if expr.indexOf('return ') is -1
+        # add a "return" function
+        expr = "function () { return #{expr} }"
+      else
+        # the expression already contains a "return"; note that it may be
+        # compound statement eg "console.log('yo'); return true"
+        expr = "function () { #{expr} }"
+
+    utils.flag this, 'object', casper.evaluate(expr)
+
+  ###
     Casper-Chai Assertions
     ----------
 
-    The following are the assertion tests that are added onto Chai Assertion.
+    The following are the assertion tests that are added onto `Chai.Assertion`.
   ###
   
   ###
@@ -174,49 +175,6 @@ module.exports = (chai, utils) ->
     @assert casper.resourceExists(@_obj),
         "expected resource #{@_obj} to exist, but it does not",
         "expected resource #{@_obj} to not exist, but it does"
-
-  ###
-    @@@@ matchOnRemote
-
-    Compare the remote evaluation to the given expression, and return
-    true when they match. The expression can be a string or a regular
-    expression. The evaluation is the same as for
-    [`trueOnRemote`](#trueonremote).
-
-    ```javascript
-    expect("return 123").to.matchOnRemote(123)
-
-    "typeof jQuery".should.not.matchOnRemote('undefined')
-
-    "123.toString()".should.matchOnRemote(/\d+/)
-    ```
-    
-    or an example in CoffeeScript
-
-    ```coffeescript
-    (-> typeof jQuery).should.not.matchOnRemote('undefined')
-    ```
-  ###
-  chai.Assertion.addMethod 'matchOnRemote', (matcher) ->
-    expr = @_obj
-
-    fn = exprAsFunction expr
-
-    remoteValue = casper.evaluate fn
-
-    if typeof matcher isnt 'string' and not (matcher instanceof RegExp)
-      if toString.call(remoteValue) is "[object RuntimeArray]"
-        # normalize the RuntimeArray type. This type is what arrays returned
-        # from casper.evaluate tend to be
-        remoteValue = Array.prototype.slice.call remoteValue
-
-      # use deepEqual
-      @_obj = remoteValue
-      @eql matcher, remoteValue
-    else
-      @assert matches(matcher, remoteValue),
-        "expected #{@_obj} (#{fn} = #{remoteValue}) to match #{matcher}",
-        "expected #{@_obj} (#{fn}) to not match #{matcher}, but it did"
 
   ###
     @@@@ matchTitle
@@ -331,42 +289,6 @@ module.exports = (chai, utils) ->
       @assert matches(matcher, text),
         "expected '#{selector}' to #{verb} #{matcher}, but it was \"#{text}\"",
         "expected '#{selector}' to not #{verb} #{matcher}, but it did"
-
-  ###
-    @@@@ trueOnRemote
-
-    The given expression evaluates to true on the remote page. Expression may
-    be a function, a function string, or a simple expression. Where a function
-    is passed in, the return value is tested. Where a simple expression is
-    passed in it is wrapped in 'function () {}', with a 'return' statement
-    added if one is not already included, and this wrapped function is
-    evaluated as an ordinary function would be.
-
-    ```javascript
-    "true".should.be.trueOnRemote;
-
-    expect("true").to.be.trueOnRemote;
-
-    (function() { return false }).should.not.be.trueOnRemote;
-
-    expect("function () { return true }").to.be.trueOnRemote;
-
-    expect("return false").to.not.be.trueOnRemote;
-
-    var foo = function () { return typeof jQuery == typeof void 0; )
-    foo.should.be.trueOnRemote; // unless Query is installed.
-
-    expect("function () { return 1 == 0 }").to.not.be.trueOnRemote;
-    ```
-  ###
-  chai.Assertion.addProperty 'trueOnRemote', () ->
-    fn = exprAsFunction(@_obj)
-
-    remoteValue = casper.evaluate(fn)
-
-    @assert remoteValue,
-      "expected expression #{@_obj} to be true, but it was #{remoteValue}",
-      "expected expression #{@_obj} to not be true, but itw as #{remoteValue}"
 
   ###
     @@@@ visible
