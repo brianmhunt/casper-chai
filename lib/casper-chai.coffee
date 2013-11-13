@@ -44,6 +44,24 @@ module.exports = (chai, utils) ->
   matches = (against, value) ->
     if against instanceof RegExp then against.test(value) else against is value
 
+
+
+  ###
+    @@@@ element
+
+    A language chain that sets an `element` flag that tells other casper-chai
+    assertions to not require all elements to match the criteria, but at least one.
+  
+    ```javascript
+    expect("ul.header li").to.have.an.element.with.attr('aria-selected')
+    ```
+
+    In this example, the assertion with pass if any `li` has the `aria-selected` attribute.
+    Otherwise, by default `attr` will assert that all elements matched have that attribute.
+  ###
+  chai.Assertion.addProperty 'element', ->
+    utils.flag this, 'element', true
+
   ###
     Casper-Chai Assertions
     ----------
@@ -52,70 +70,37 @@ module.exports = (chai, utils) ->
   ###
   
   ###
-    @@@@ attr(attribute_name)
+    @@@@ attr(attributeName)
+    @@@@ attribute(attributeName)
 
-    True when the attribute `attribute_name` on `selector` is true.
-  
-    If the selector matches more than one element with the attribute set, this
-    will fail. In those cases try [attrAll](#attrall) or [attrAny](#attrany).
-
+    Asserts that attribute `attribute_name` are on all elements matched by `selector`.
+    If the `element` chain was used, it asserts that any element has that selector.
 
     ```javascript
     expect("#my_header").to.have.attr('class')
+    expect("ul.header li").to.have.an.element.with.attribute('aria-selected')
     ```
   ###
-  chai.Assertion.addMethod 'attr', (attr) ->
+  assertAttr = (attr) ->
     selector = @_obj
 
     attrs = casper.getElementsAttribute(selector, attr)
 
-    chai.assert.equal(attrs.length, 1,
-      "Expected #{selector} to have one match, but it had #{attrs.length}")
+    if utils.flag(this, 'element')
+      @assert attrs.some((a) -> a),
+        "Expected some elements matching selector #{selector} to have attribute" +
+          "#{attr} set, but none did",
+        "Expected no elements matching selector #{selector} to have attribute" +
+          "#{attr} set, but at least one did"
+    else
+      @assert attrs.every((a) -> a),
+        "Expected all elements matching selector #{selector} to have attribute " +
+          "#{attr} set, but some did not have it",
+        "Expected no elements matching selector #{selector} to have attribute " +
+          "#{attr} set, but some had it"
 
-    attr_v = attrs[0]
-
-    @assert attr_v,
-      "Expected selector #{selector} to have attribute #{attr}, but it did not",
-      "Expected selector #{selector} to not have attribute #{attr}, " +
-        "but it was #{attr_v}"
-
-  ###
-    @@@@ attrAny(attribute_name)
-
-    True when an attribute is set on at least one of the given selectors.
-
-    ```javascript
-    expect("div.menu li").to.have.attrAny('selected')
-    ```
-  ###
-  chai.Assertion.addMethod 'attrAny', (attr) ->
-    selector = @_obj
-    attrs = casper.getElementsAttribute(selector, attr)
-
-    @assert attrs.some((a) -> a),
-      "Expected one element matching selector #{selector} to have attribute" +
-        "#{attr} set, but none did",
-      "Expected no elements matching selector #{selector} to have attribute" +
-        "#{attr} set, but at least one did"
-
-  ###
-    @@@@ attrAll(attribute_name)
-
-    True when an attribute is set on all of the given selectors.
-
-    ```javascript
-    expect("div.menu li").to.have.attrAll('class')
-    ```
-  ###
-  chai.Assertion.addMethod 'attrAll', (attr) ->
-    selector = @_obj
-    attrs = casper.getElementsAttribute(selector, attr)
-
-    @assert attrs.every((a) -> a),
-      "Expected all elements matching selector #{selector} to have attribute" +
-        "#{attr} set, but one did not have it",
-      "Expected one elements matching selector #{selector} to not have " +
-        " attribute #{attr} set, but they all had it"
+  chai.Assertion.addMethod 'attr', assertAttr
+  chai.Assertion.addMethod 'attribute', assertAttr
 
   ###
     @@@@ fieldValue

@@ -43,48 +43,31 @@ describe "Casper-Chai addons to Chai", ->
       casper.then ->
         expect("#waldo").to.have.attr('class')
 
-    it "matches class by id", ->
-      casper.then ->
-        expect("#waldo").to.not.have.attr('classless')
-
-    it 'returns false where attribute is empty', ->
+    it 'does not match where attribute is empty', ->
       casper.then ->
         expect("#waldo").to.not.have.attr("data-empty")
 
-    it 'fails when more than one attribute is returned', ->
-      casper.then ->
-        # two div classes have 'class'; explicitly fail - use attrAny or
-        # attrAll
-        failed = false
-        try
-          expect("div").to.not.have.attr('class')
-        catch err
-          failed = true
-
-        failed.should.be.true
-
-  describe "the attrAny method", ->
-    it "finds one div with an 'id' attribute", ->
-      casper.then ->
-        expect('div').to.have.attrAny("id")
-
-    it "finds divs with an 'class' attribute", ->
-      casper.then ->
-        # all divs have the class attribute
-        expect('div').to.have.attrAny("class")
-
-    it "finds no divs with an 'data-empty' attribute", ->
-      casper.then ->
-        expect('div').to.not.have.attrAny("data-empty")
-
-  describe "the attrAll method", ->
     it "finds not all divs have an 'id' attribute", ->
       casper.then ->
-        expect('div').to.not.have.attrAll('id')
+        expect('div').to.not.have.attr('id')
 
     it "finds that all divs have a 'class' attribute", ->
       casper.then ->
-        expect("div").to.have.attrAll('class')
+        expect("div").to.have.attr('class')
+
+    describe "with element chain", ->
+      it "matches any div with an 'id' attribute", ->
+        casper.then ->
+          expect('div').to.have.an.element.with.attr("id")
+
+      it "finds divs with an 'class' attribute", ->
+        casper.then ->
+          # all divs have the class attribute
+          expect('div').to.have.an.element.with.attr("class")
+
+      it "finds no divs with an 'data-empty' attribute", ->
+        casper.then ->
+          expect('div').to.not.have.an.element.with.attr("data-empty")
 
   describe "the tagName method", ->
     it "finds that the '.says' tags are all 'divs'", ->
