@@ -3,7 +3,7 @@
 **Casper–Chai** provides a set of custom assertions for use with [CasperJS][].
 You get all the benefits of [Chai][] to test with CasperJS.
 
-It is an alternative to Casper's built-in [Tester][].  Instead of using
+It is an alternative to Casper's built-in [Tester][] assertions.  Instead of using
 Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
 
     describe("my page", function () {
@@ -20,91 +20,60 @@ Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
       });
     });
 
-### Tests
+### Examples
 
-<table>
-  <thead>
-    <th>Name</th>
-    <th>Description - passes when ...</th>
-    <th>Example</th>
-  </thead>
-  <tbody>
-    <tr>
-      <td><a href='docs/casper-chai.md#attr'>attr(attr_name)</a></td>
-      <td>exactly one element matching the selector has the given attribute</td>
-      <td>expect("#header_a").to.have.attr('target')</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#attrany'>attrAny(attr_name)</a></td>
-      <td>any element matching the selector has the given attribute</td>
-      <td>expect(".menu div").to.have.attr('data-bind')</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#attrall'>attrAll(attr_name)</a></td>
-      <td>all elements matching selector have the given attribute</td>
-      <td>expect('.menu div a').to.have.attr('href')</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#fieldvalue'>fieldValue(value)</a></td>
-      <td>the named input provided has the given value</td>
-      <td>"field_name".should.have.fieldValue("someValue")</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#indom'>inDOM</a></td>
-      <td>when the given selector is in the DOM</td>
-      <td>expect('#header').to.be.inDOM</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#loaded'>loaded</a></td>
-      <td>when the given resource exists</td>
-      <td>expect('styles.css').to.be.loaded</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#matchcurrenturl'>matchCurrentUrl</a></td>
-      <td>the current URL matches</td>
-      <td>expect(/https:\/\//).to.matchCurrentUrl
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#matchonremote'>matchOnRemote</a></td>
-      <td>compare the remote evaluation to the given expression</td>
-      <td>expect("typeof jQuery").to.matchOnRemote('undefined')</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#matchtitle'>matchTitle</a></td>
-      <td>the current Title matches</td>
-      <td>expect(/Google/).to.matchTitle</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#tagname'>tagName(valid_tags)</a></td>
-      <td>all elements matching the selectors are one of the given tags</td>
-      <td>expect('.menu *').to.have.tagName(['div', 'span'])</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#textindom'>textInDOM</a></td>
-      <td>the text can be found in the DOM</td>
-      <td>expect('About google').to.be.textInDOM</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#text'>text(expression)</a></td>
-      <td>
-        the text of the given selector matches the expression (a string or regular expression).
-      </td>
-      <td>expect('#my_header').to.have.text("My Header")</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#trueonremote'>trueOnRemote</a></td>
-      <td>the remote expression evaluates to something truthy</td>
-      <td>expect("true").to.be.trueOnRemote</td>
-    </tr>
-    <tr>
-      <td><a href='docs/casper-chai.md#visible'>visible</a></td>
-      <td>the selector matches a visible element</td>
-      <td>expect('#my_header').to.be.visible</td>
-    </tr>
-  </tbody>
-</table>
+````html
+<html>
+  <head>
+    <title>Casper-Chai Example</title>
+    <link rel="stylesheet" href="site.css" type="text/css">
+  </head>
+  <body>
+    <header>
+      <a href="javascript:void(0)" class="signin">Sign In</a>
+    </header>
+    <article>
+      <ul class="breadcrumbs">
+        <li>Home</li>
+        <li>Blog</li>
+        <li aria-selected="true">Using Chai in your casper tests</li>
+      </ul>
+      <div class="greeting">Hello</div>
+      <span class="greeting help">Need help?</span>
+    </article>
+    <footer>
+      <a href="/help" id="help-link" class="help">Help</a>
+    </footer>
+  </body>
+</html>
+````
 
-More [documentation and examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md).
+Assertions that pass
+
+````javascript
+expect(/Casper/).to.matchTitle
+'Casper-Chai Example'.to.matchTitle
+'site.css'.should.be.loaded
+'body > header'.should.be.inDOM
+(function() { document.querySelectorAll('li').count === 3 }).to.be.trueOnRemote
+'#help-link'.should.have.attribute('href')
+'ul.breadcrumbs li'.should.contain.an.element.with.attr('aria-selected')
+'.greeting'.to.have.tagNames(['div', 'span'])
+'li[aria-selected]'.should.contain.text('Using Chai')
+'header a'.should.have.text(/Sign/)
+'.greeting'.should.not.have.text(/Bye/)
+````
+
+Assertions that fail
+
+````javascript
+'li'.should.have.attr('aria-selected')
+'li'.should.not.have.an.element.with.attr('aria-selected')
+'.greeting'.should.not.have.tagName('span')
+'.help'.should.have.text('Help')
+````
+
+[Full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md).
 
 For even more examples, if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
@@ -115,7 +84,7 @@ tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee)
 
 Casper-Chai can be installed with [npm][] using `npm install casper-chai`, or
 including
-[`lib/casper-chai.coffee`](https://raw.github.com/brianmhunt/casper-chai/master/lib/casper-chai.coffee)
+[`casper-chai.coffee`](https://raw.github.com/brianmhunt/casper-chai/master/lib/casper-chai.coffee)
 in a directory `require` will find it.
 
 Add extensions to Chai with:
@@ -124,8 +93,7 @@ Add extensions to Chai with:
     chai.use(casper_chai);
 
 To develop and test casper-chai locally, clone the project and run `npm install` to get dependencies
-(which, obviously, requires [npm][] to be installed), and make sure `cake` and is
-available - which should be possible by running `npm install -g coffee-script`. Also make sure you have the latest version of [casperjs][] installed.
+(which, obviously, requires [npm][] to be installed). You will need `cake` to generate documentation - which should be possible by running `npm install -g coffee-script`. Also make sure you have the latest version of [casperjs][] installed.
 
 [CasperJS]: http://casperjs.org/
 [Chai]: http://chaijs.com/
