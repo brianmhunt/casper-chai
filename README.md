@@ -22,6 +22,8 @@ Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
 
 ### Examples
 
+Say we have a page like this:
+
 ````html
 <html>
   <head>
@@ -48,15 +50,15 @@ Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
 </html>
 ````
 
-Assertions that pass
+Here are some assertions that pass
 
 ````javascript
 expect(/Casper/).to.matchTitle
-'Casper-Chai Example'.to.matchTitle
+'Casper-Chai Example'.should.matchTitle
 'site.css'.should.be.loaded
 'body > header'.should.be.inDOM
 (function() { document.querySelectorAll('li').count === 3 }).to.be.trueOnRemote
-'#help-link'.should.have.attribute('href')
+'#help-link'.should.have.attribute('href')[0].and.equal("/help")
 'ul.breadcrumbs li'.should.contain.an.element.with.attr('aria-selected')
 '.greeting'.to.have.tagNames(['div', 'span'])
 'li[aria-selected]'.should.contain.text('Using Chai')
@@ -64,18 +66,17 @@ expect(/Casper/).to.matchTitle
 '.greeting'.should.not.have.text(/Bye/)
 ````
 
-Assertions that fail
+Here are some assertions that fail
 
 ````javascript
 'li'.should.have.attr('aria-selected')
 'li'.should.not.have.an.element.with.attr('aria-selected')
 '.greeting'.should.not.have.tagName('span')
 '.help'.should.have.text('Help')
+'li[aria-selected]'.should.have.text('Using Chai')
 ````
 
-[Full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md).
-
-For even more examples, if you are cool with
+[Full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md), and if you are cool with
 [CoffeeScript](http://coffeescript.org/), check out the [unit
 tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee).
 

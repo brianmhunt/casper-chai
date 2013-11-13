@@ -80,6 +80,14 @@ module.exports = (chai, utils) ->
     expect("#my_header").to.have.attr('class')
     expect("ul.header li").to.have.an.element.with.attribute('aria-selected')
     ```
+
+    It also changes the subject of the assertion to the attributes, so you can do
+    further assertions on those attributes
+
+    ````javascript
+    "#tabs li a".should.have.an.element.with.attribute('aria-selected')[0].that.equals('true')
+    "section a.add".should.have.attr('data-bind')[0].and.contains('click:')
+    ````
   ###
   assertAttr = (attr) ->
     selector = @_obj
@@ -98,6 +106,8 @@ module.exports = (chai, utils) ->
           "#{attr} set, but some did not have it",
         "Expected no elements matching selector #{selector} to have attribute " +
           "#{attr} set, but some had it"
+
+    utils.flag this, 'object', attrs
 
   chai.Assertion.addMethod 'attr', assertAttr
   chai.Assertion.addMethod 'attribute', assertAttr

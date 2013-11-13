@@ -31,6 +31,7 @@ describe "Casper-Chai addons to Chai", ->
 
     <form action=''>
       <input id='afield' name='anamedfield' value='42' />
+      <input id='anotherfield' name='foo' type='number' />
     </form>
   </body>
 </html>"
@@ -54,6 +55,10 @@ describe "Casper-Chai addons to Chai", ->
     it "finds that all divs have a 'class' attribute", ->
       casper.then ->
         expect("div").to.have.attr('class')
+
+    it 'should change the assertion subject to the attributes', ->
+      casper.then ->
+        expect('input').to.have.attribute('name').and.deep.equal(['anamedfield', 'foo'])
 
     describe "with element chain", ->
       it "matches any div with an 'id' attribute", ->
