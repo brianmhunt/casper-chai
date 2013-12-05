@@ -257,6 +257,5 @@ describe "Casper-Chai addons to Chai", ->
         # document.body.appendChild(v);
 
       casper.then ->
-        expect(-> typeof jQuery).to.not.matchOnRemote("undefined")
-        (-> typeof jQuery).should.not.matchOnRemote('undefined')
+        expect(-> typeof jQuery).to.not.evaluate.to.equal("undefined")
         expect('jquery-1.8.3.min.js').to.be.loaded
