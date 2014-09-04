@@ -57,7 +57,7 @@ expect(/Casper/).to.matchTitle
 'Casper-Chai Example'.should.matchTitle
 'site.css'.should.be.loaded
 'body > header'.should.be.inDOM
-'document.querySelectorAll('li').count'.should.evaluate.to.be.above(2)
+'document.querySelectorAll('li').length'.should.evaluate.to.be.above(2)
 '#help-link'.should.have.attribute('href')[0].and.equal("/help")
 'ul.breadcrumbs li'.should.contain.an.element.with.attr('aria-selected')
 '.greeting'.should.have.tagName(['div', 'span'])
