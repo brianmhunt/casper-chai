@@ -20,15 +20,15 @@
   "directories": {
     "lib": "./lib"
   },
-  "main": "./lib/casper-chai.coffee",
+  "main": "./lib/casper-chai.js",
   "scripts": {
     "test": "./node_modules/mocha-casperjs/bin/mocha-casperjs --casper-chai-path=lib/casper-chai --expect",
     "lint": "jshint ./lib"
   },
   "devDependencies": {
     "chai": ">= 1.8.1",
-    "mocha-casperjs": "0.1.x",
-    "mocha": ">= 1.13.0",
+    "mocha-casperjs": "~0.1.x",
+    "mocha": "~1.18",
     "glob": "*",
     "semver": "*"
   }

@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - 0.10
+  - 4
 
-before_script: 
+before_script:
 - npm install
 - wget https://codeload.github.com/n1k0/casperjs/legacy.tar.gz/master -nv -O - | tar zx
 - sudo ln -s `pwd`/`ls */bin/casperjs` /usr/local/bin/casperjs

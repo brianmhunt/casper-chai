@@ -7,8 +7,8 @@
 #     test:
 #     	Try out some Casper-Chai magic
 #
-#     toast:
-#       Turn lib/coffeescript into build/javascript
+#     docs:
+#       Build documentation from source code comments
 #
 try
   {spawn} = require 'child_process'
@@ -22,8 +22,7 @@ catch err
 
 
 SRC_DIR = 'lib'
-COFFEE_SRC = ['casper-chai.coffee']
-UGLIFY_CMD = './node_modules/uglify-js2/bin/uglifyjs2'
+COFFEE_SRC = ['casper-chai.js']
 DOC_TARGET = 'docs/casper-chai.md'
 
 
