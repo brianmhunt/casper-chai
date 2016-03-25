@@ -11,7 +11,7 @@ assertions to not require all elements to match the criteria, but at least one.
 expect("ul.header li").to.have.an.element.with.attr('aria-selected')
 ```
 
-In this example, the assertion with pass if any `li` has the `aria-selected` attribute.
+In this example, the assertion will pass if any `li` has the `aria-selected` attribute.
 Otherwise, by default `attr` will assert that all elements matched have that attribute.
 #### evaluate
 
