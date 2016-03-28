@@ -76,8 +76,7 @@ Here are some assertions that fail
 'li[aria-selected]'.should.have.text('Using Chai')
 ````
 
-See the [full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md), and if you are cool with
-[CoffeeScript](http://coffeescript.org/), check out the [unit
+See the [full documentation and more examples](https://github.com/brianmhunt/casper-chai/blob/master/docs/casper-chai.md) and check out the [unit
 tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee).
 
 
@@ -85,7 +84,7 @@ tests](https://github.com/brianmhunt/casper-chai/blob/master/test/common.coffee)
 
 Casper-Chai can be installed with [npm][] using `npm install casper-chai`, or
 including
-[`casper-chai.coffee`](https://raw.github.com/brianmhunt/casper-chai/master/lib/casper-chai.coffee)
+[`casper-chai.js`](https://raw.github.com/brianmhunt/casper-chai/master/lib/casper-chai.js)
 in a directory `require` will find it.
 
 Add extensions to Chai with:
