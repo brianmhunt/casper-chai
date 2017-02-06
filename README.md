@@ -6,19 +6,21 @@ You get all the benefits of [Chai][] to test with CasperJS.
 It is an alternative to Casper's built-in [Tester][] assertions.  Instead of using
 Casper's Tester you can use (in this case with [mocha-casperjs][] and Chai):
 
-    describe("my page", function () {
-      it("can be opened by Casper", function () {
-        casper.open("http://www.google.com")
+```javascript
+describe("my page", function () {
+  it("can be opened by Casper", function () {
+    casper.open("http://www.google.com")
 
-        casper.then(function () {
-          expect(casper.currentHTTPStatus).to.equal(200);
-        });
-
-        casper.then(function () {
-          expect("Google").to.matchTitle
-        });
-      });
+    casper.then(function () {
+      expect(casper.currentHTTPStatus).to.equal(200);
     });
+
+    casper.then(function () {
+      expect("Google").to.matchTitle
+    });
+  });
+});
+```
 
 ### Examples
 
@@ -89,8 +91,10 @@ in a directory `require` will find it.
 
 Add extensions to Chai with:
 
-    casper_chai = require('casper-chai');
-    chai.use(casper_chai);
+```javascript
+casper_chai = require('casper-chai');
+chai.use(casper_chai);
+```
 
 To develop and test casper-chai locally, clone the project and run `npm install` to get dependencies
 (which, obviously, requires [npm][] to be installed). You will need `cake` to generate documentation - which should be possible by running `npm install -g coffee-script`. Also make sure you have the latest version of [casperjs][] installed.
