@@ -101,7 +101,7 @@ To develop and test casper-chai locally, clone the project and run `npm install`
 
 [CasperJS]: http://casperjs.org/
 [Chai]: http://chaijs.com/
-[Mocha]: http://visionmedia.github.com/mocha/
+[Mocha]: http://mochajs.org/
 [mocha-casperjs]: http://github.com/nathanboktae/mocha-casperjs
 [npm]: https://npmjs.org/
 [Tester]: http://casperjs.org/api.html#tester
